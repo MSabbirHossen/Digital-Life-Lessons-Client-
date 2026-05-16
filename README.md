@@ -5,6 +5,7 @@ A modern, responsive React-based web application for discovering, creating, and 
 ## 🌟 Features
 
 ### For Students
+
 - 🔍 **Browse & Search**: Discover lessons by category, difficulty, and rating
 - 📚 **Learn**: Access detailed lesson content with materials and resources
 - ⭐ **Favorites**: Bookmark your favorite lessons for quick access
@@ -13,6 +14,7 @@ A modern, responsive React-based web application for discovering, creating, and 
 - 🎓 **Premium Access**: Unlock exclusive premium lessons with subscription
 
 ### For Instructors
+
 - ✍️ **Create**: Build rich lessons with multimedia content
 - 📈 **Analytics**: Track student engagement and lesson performance
 - 💰 **Monetize**: Set pricing for premium lessons and earn revenue
@@ -20,6 +22,7 @@ A modern, responsive React-based web application for discovering, creating, and 
 - 📱 **Responsive**: Your lessons look great on all devices
 
 ### For Administrators
+
 - 👥 **User Management**: Manage user accounts and permissions
 - 📋 **Content Moderation**: Review and approve lesson content
 - 📢 **Reports**: Handle user reports and maintain platform quality
@@ -29,24 +32,28 @@ A modern, responsive React-based web application for discovering, creating, and 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js (v16 or higher)
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/MSabbirHossen/Digital-Life-Lessons-Client-.git
 cd client
 ```
 
 2. **Install dependencies**
+
 ```bash
 npm install
 ```
 
 3. **Configure environment**
-Create a `.env.local` file based on `.env.example`:
+   Create a `.env.local` file based on `.env.example`:
+
 ```env
 VITE_API_URL=http://localhost:5000/api
 VITE_FIREBASE_API_KEY=your_firebase_key
@@ -58,6 +65,7 @@ VITE_FIREBASE_APP_ID=your_app_id
 ```
 
 4. **Start development server**
+
 ```bash
 npm run dev
 ```
@@ -67,16 +75,19 @@ The application will be available at `http://localhost:5173`
 ## 📦 Build
 
 ### Development Build
+
 ```bash
 npm run dev
 ```
 
 ### Production Build
+
 ```bash
 npm run build
 ```
 
 ### Preview Build
+
 ```bash
 npm run preview
 ```
@@ -123,26 +134,32 @@ client/
 ## 🔧 Technology Stack
 
 ### Frontend Framework
+
 - **React** (v18.2.0) - UI library
 - **Vite** (v4.3.4) - Build tool and dev server
 - **React Router DOM** (v6.11.0) - Client-side routing
 
 ### Styling
+
 - **Tailwind CSS** (v3.3.2) - Utility-first CSS framework
 - **PostCSS** (v8.4.24) - CSS processing
 - **Autoprefixer** (v10.4.14) - Browser compatibility
 
 ### Authentication & Database
+
 - **Firebase** (v9.23.0) - Authentication and real-time database
 - **Firebase Admin SDK** - Server-side authentication (backend)
 
 ### HTTP & API
+
 - **Axios** (v1.4.0) - HTTP client for API requests
 
 ### Payment Processing
+
 - **Stripe** (v12.1.1) - Payment integration (backend)
 
 ### UI Components & Effects
+
 - **React Toastify** (v9.1.3) - Toast notifications
 - **SweetAlert2** (v11.7.3) - Beautiful modals and alerts
 - **Lottie React** (v2.4.0) - Animated graphics
@@ -170,6 +187,7 @@ client/
 ## 🎨 Theming
 
 Customize the appearance through:
+
 - **Tailwind Config**: `tailwind.config.js`
 - **CSS Variables**: `src/styles/index.css`
 - **Color Scheme**: Primary and secondary brand colors
@@ -178,6 +196,7 @@ Customize the appearance through:
 ## 🔄 API Integration
 
 The application communicates with a Node.js/Express backend for:
+
 - User authentication and authorization
 - Lesson CRUD operations
 - User profile management
@@ -204,12 +223,15 @@ The application communicates with a Node.js/Express backend for:
 ## 🐛 Debugging
 
 ### Development Tools
+
 - React Developer Tools browser extension
 - Vite debugging in browser DevTools
 - Console error logging
 
 ### Environment Variables
+
 Create `.env.development.local` for development:
+
 ```env
 VITE_DEBUG=true
 VITE_API_URL=http://localhost:5000/api
