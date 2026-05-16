@@ -1,17 +1,20 @@
 # Digital Life Lessons - Client Features
 
 ## Project Overview
+
 A comprehensive React-based learning platform with user authentication, lesson management, premium subscriptions, and admin controls.
 
 ## Architecture & Infrastructure
 
 ### Core Setup
+
 - **Framework**: React 18.2.0 with Vite
 - **Styling**: Tailwind CSS + PostCSS
 - **Build Tool**: Vite 4.3.4
 - **Package Manager**: npm
 
 ### Key Dependencies
+
 - React Router DOM (v6.11.0) - Client-side routing
 - Firebase (v9.23.0) - Authentication & real-time database
 - Axios (v1.4.0) - HTTP client for API calls
@@ -24,6 +27,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 ## Implemented Components
 
 ### Authentication System
+
 - **AuthContext** (`context/AuthContext.jsx`)
   - Manages user authentication state
   - Firebase integration for login/logout
@@ -43,6 +47,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
   - Terms and conditions acceptance
 
 ### Navigation & Layout
+
 - **Navbar Component** (`components/Navbar.jsx`)
   - Responsive navigation
   - User menu with profile options
@@ -56,6 +61,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
   - Newsletter subscription
 
 ### Route Protection
+
 - **PrivateRoute Component** (`components/PrivateRoute.jsx`)
   - Protects user-only routes
   - AdminRoute variant for admin-only routes
@@ -64,6 +70,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 ## Public Pages
 
 ### Home Page (`pages/Home.jsx`)
+
 - Landing page with hero section
 - Featured lessons showcase
 - Benefits and features overview
@@ -71,6 +78,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Statistics and user testimonials
 
 ### Public Lessons (`pages/PublicLessons.jsx`)
+
 - Browse all available lessons
 - Filtering by category, difficulty, rating
 - Search functionality
@@ -78,6 +86,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Pagination support
 
 ### Lesson Details Page (`pages/LessonDetailsPage.jsx`)
+
 - Complete lesson information
 - Instructor profile and bio
 - Student reviews and ratings
@@ -89,12 +98,14 @@ A comprehensive React-based learning platform with user authentication, lesson m
 ## User Dashboard Features
 
 ### Dashboard Overview (`pages/Dashboard.jsx`)
+
 - User statistics and progress
 - Recent activities
 - Quick links to all features
 - Learning streak tracker
 
 ### My Lessons (`pages/MyLessonsPage.jsx`)
+
 - List of user-created lessons
 - Lesson statistics (views, enrollments)
 - Edit/Delete functionality
@@ -103,6 +114,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Bulk actions support
 
 ### Update Lesson (`pages/UpdateLessonPage.jsx`)
+
 - Edit lesson information
 - Update course content
 - Modify pricing and access level
@@ -111,6 +123,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Save as draft or publish
 
 ### Add Lesson (`pages/AddLesson.jsx`)
+
 - Create new lessons with rich editor
 - Category and difficulty selection
 - Set pricing (free or premium)
@@ -118,6 +131,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Publish immediately or save as draft
 
 ### My Favorites (`pages/MyFavoritesPage.jsx`)
+
 - View bookmarked lessons
 - Organized collection management
 - Quick access to favorite content
@@ -125,6 +139,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Sort and filter options
 
 ### User Profile (`pages/UserProfilePage.jsx`)
+
 - View and edit profile information
 - Change profile picture
 - Update bio and personal details
@@ -134,6 +149,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Account security options
 
 ### Pricing Page (`pages/PricingPage.jsx`)
+
 - Display pricing tiers
 - Premium features comparison
 - Upgrade to premium button
@@ -144,6 +160,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 ## Premium & Payment Pages
 
 ### Payment Success Page (`pages/PaymentSuccessPage.jsx`)
+
 - Confirmation message
 - Subscription activation details
 - Transaction receipt
@@ -152,6 +169,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Redirect to dashboard option
 
 ### Payment Cancel Page (`pages/PaymentCancelPage.jsx`)
+
 - Cancellation confirmation
 - Reason explanation
 - Retry payment option
@@ -162,6 +180,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 ## Admin Dashboard Features
 
 ### Admin Dashboard (`pages/AdminDashboardPage.jsx`)
+
 - Statistics overview
   - Total users count
   - Total lessons count
@@ -172,6 +191,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Recent activities log
 
 ### Manage Users (`pages/ManageUsersPage.jsx`)
+
 - List all registered users
 - User information display
 - Search and filter by role
@@ -181,6 +201,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - User statistics and engagement
 
 ### Manage Lessons (`pages/ManageLessonsPage.jsx`)
+
 - Review all lessons on platform
 - Lesson details and metadata
 - Content moderation tools
@@ -190,6 +211,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Lesson statistics and performance
 
 ### Reported Lessons (`pages/ReportedLessonsPage.jsx`)
+
 - View reported lesson content
 - Report details and reason
 - User reports history
@@ -199,6 +221,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Report resolution tracking
 
 ### Admin Profile (`pages/AdminProfilePage.jsx`)
+
 - Admin account management
 - Security settings
 - Activity logs
@@ -209,6 +232,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 ## Custom Hooks
 
 ### useLessons (`hooks/useLessons.js`)
+
 - Fetch lessons from API
 - Handle lesson pagination
 - Manage lesson state
@@ -216,6 +240,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Loading and error states
 
 ### useInteractions (`hooks/useInteractions.js`)
+
 - Manage user interactions (likes, favorites)
 - Track user engagement
 - Handle favorite/bookmark operations
@@ -225,6 +250,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 ## Services & Configuration
 
 ### API Service (`services/api.js`)
+
 - Axios instance configuration
 - Base URL and interceptors
 - Authentication token injection
@@ -232,6 +258,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Request/response middleware
 
 ### Firebase Config (`config/firebase.js`)
+
 - Firebase initialization
 - Authentication setup
 - Firestore configuration
@@ -241,30 +268,35 @@ A comprehensive React-based learning platform with user authentication, lesson m
 ## Styling & UI
 
 ### Tailwind CSS Integration (`tailwind.config.js`)
+
 - Custom theme colors (primary, secondary)
 - Responsive breakpoints
 - Animation definitions
 - Component styling classes
 
 ### Global Styles (`styles/index.css`)
+
 - CSS variables
 - Custom animations
 - Component-specific styles
 - Utility classes
 
 ### PostCSS Config (`postcss.config.js`)
+
 - Tailwind CSS processing
 - Autoprefixer for browser compatibility
 
 ## Build & Development
 
 ### Vite Configuration (`vite.config.js`)
+
 - React plugin setup
 - Development server configuration
 - Build optimization
 - HMR (Hot Module Replacement)
 
 ### Environment Configuration (`.env.example`)
+
 - API endpoint configuration
 - Firebase credentials
 - Environment variables template
@@ -272,47 +304,55 @@ A comprehensive React-based learning platform with user authentication, lesson m
 ## Features Summary
 
 ✅ **User Authentication**
+
 - Email/password login
 - Social login integration
 - Token-based session management
 
 ✅ **Lesson Management**
+
 - Create, read, update, delete lessons
 - Rich content editing
 - File uploads and attachments
 - Category and difficulty classification
 
 ✅ **Search & Discovery**
+
 - Full-text search
 - Advanced filtering
 - Category browsing
 - Rating and recommendation system
 
 ✅ **User Engagement**
+
 - Favorite/bookmark lessons
 - Comments and discussions
 - Ratings and reviews
 - User following system
 
 ✅ **Premium Features**
+
 - Premium lesson access
 - Advanced content creation
 - Priority support
 - Stripe payment integration
 
 ✅ **Admin Controls**
+
 - User management
 - Content moderation
 - Report handling
 - Platform statistics
 
 ✅ **Responsive Design**
+
 - Mobile-first approach
 - Tablet optimization
 - Desktop experience
 - Cross-browser compatibility
 
 ## Security Features
+
 - Protected routes for authenticated users
 - Admin route protection
 - CORS configuration
@@ -320,6 +360,7 @@ A comprehensive React-based learning platform with user authentication, lesson m
 - Input validation and sanitization
 
 ## Performance Optimizations
+
 - Code splitting and lazy loading
 - Image optimization
 - Caching strategies
