@@ -5,12 +5,16 @@ import { toast } from "react-toastify";
 export const useFavorites = () => {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState(null);
 
-  const getUserFavorites = useCallback(async () => {
+  const getUserFavorites = useCallback(async (page = 1, limit = 9) => {
     setLoading(true);
     try {
-      const response = await api.get("/lessons/favorites/my-favorites");
-      setFavorites(response.data);
+      const response = await api.get("/lessons/favorites/my-favorites", {
+        params: { page, limit },
+      });
+      setFavorites(response.data.favorites || []);
+      setPagination(response.data.pagination || null);
     } catch (error) {
       toast.error("Failed to fetch favorites");
     } finally {
@@ -36,7 +40,7 @@ export const useFavorites = () => {
       await api.post("/lessons/favorites/remove", { lessonId });
       toast.success("Removed from favorites");
       setFavorites((prev) =>
-        prev.filter((fav) => fav.lessonId._id !== lessonId),
+        prev.filter((fav) => fav.lessonId?._id !== lessonId),
       );
       return true;
     } catch (error) {
@@ -45,7 +49,14 @@ export const useFavorites = () => {
     }
   }, []);
 
-  return { favorites, loading, getUserFavorites, addFavorite, removeFavorite };
+  return {
+    favorites,
+    loading,
+    pagination,
+    getUserFavorites,
+    addFavorite,
+    removeFavorite,
+  };
 };
 
 export const useInteractions = () => {

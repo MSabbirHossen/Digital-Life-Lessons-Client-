@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useLessons } from "../hooks/useLessons";
 import { useInteractions, useFavorites } from "../hooks/useInteractions";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { REPORT_REASONS } from "../constants/lessons";
 
 const LessonDetailsPage = () => {
   const { id } = useParams();
@@ -21,6 +23,7 @@ const LessonDetailsPage = () => {
   const [submittingComment, setSubmittingComment] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportData, setReportData] = useState({ reason: "", description: "" });
+  const [isPremiumBlocked, setIsPremiumBlocked] = useState(false);
 
   useEffect(() => {
     fetchLesson();
@@ -34,6 +37,7 @@ const LessonDetailsPage = () => {
       if (lessonData) {
         setLesson(lessonData.lesson);
         setComments(lessonData.comments || []);
+        setIsPremiumBlocked(Boolean(lessonData.isPremiumBlocked));
       }
     } catch (error) {
       toast.error("Failed to load lesson");
@@ -151,6 +155,9 @@ const LessonDetailsPage = () => {
     );
   }
 
+  const isOwner = user?._id === lesson.userId?._id;
+  const canModerate = user?.role === "admin" || isOwner;
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
@@ -203,7 +210,12 @@ const LessonDetailsPage = () => {
               />
             )}
             <div>
-              <p className="font-semibold">{lesson.userId?.name}</p>
+              <Link
+                to={`/profile/${lesson.userId?._id}`}
+                className="font-semibold hover:text-primary"
+              >
+                {lesson.userId?.name}
+              </Link>
               <p className="text-gray-600 text-sm">
                 {new Date(lesson.createdAt).toLocaleDateString()} •{" "}
                 {lesson.views || 0} views
@@ -212,11 +224,33 @@ const LessonDetailsPage = () => {
           </div>
 
           {/* Lesson Content */}
-          <div className="prose max-w-none">
-            <p className="text-lg leading-relaxed text-gray-800 whitespace-pre-wrap">
-              {lesson.description}
-            </p>
-          </div>
+          {isPremiumBlocked ? (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
+              <div className="text-4xl mb-3">Lock</div>
+              <h2 className="text-2xl font-bold text-yellow-900 mb-2">
+                Premium lesson
+              </h2>
+              <p className="text-yellow-800 mb-6">
+                Upgrade to Premium to read the full lesson and support deeper
+                community reflections.
+              </p>
+              {user ? (
+                <Link to="/pricing" className="btn-secondary">
+                  Upgrade to Premium
+                </Link>
+              ) : (
+                <Link to="/login" className="btn-primary">
+                  Login to Upgrade
+                </Link>
+              )}
+            </div>
+          ) : (
+            <div className="prose max-w-none">
+              <p className="text-lg leading-relaxed text-gray-800 whitespace-pre-wrap">
+                {lesson.description}
+              </p>
+            </div>
+          )}
 
           {lesson.accessLevel === "Premium" && (
             <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
@@ -226,7 +260,7 @@ const LessonDetailsPage = () => {
 
           {/* Action Buttons */}
           <div className="mt-8 flex gap-4">
-            {user?.role === "admin" || user?._id === lesson.userId?._id ? (
+            {canModerate ? (
               <>
                 <button
                   onClick={() => navigate(`/dashboard/update-lesson/${id}`)}
@@ -236,7 +270,16 @@ const LessonDetailsPage = () => {
                 </button>
                 <button
                   onClick={async () => {
-                    if (window.confirm("Delete this lesson?")) {
+                    const result = await Swal.fire({
+                      title: "Delete this lesson?",
+                      text: "This action cannot be undone.",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonText: "Delete",
+                      confirmButtonColor: "#dc2626",
+                    });
+
+                    if (result.isConfirmed) {
                       try {
                         await api.delete(`/lessons/${id}`);
                         toast.success("Lesson deleted");
@@ -265,7 +308,7 @@ const LessonDetailsPage = () => {
         <div className="bg-white rounded-lg shadow p-8">
           <h2 className="text-2xl font-bold mb-6">Comments</h2>
 
-          {user ? (
+          {user && !isPremiumBlocked ? (
             <form onSubmit={handleAddComment} className="mb-8 pb-8 border-b">
               <textarea
                 value={commentText}
@@ -285,7 +328,9 @@ const LessonDetailsPage = () => {
           ) : (
             <div className="mb-8 pb-8 border-b text-center">
               <p className="text-gray-600 mb-4">
-                Please login to comment on this lesson
+                {isPremiumBlocked
+                  ? "Upgrade to Premium to join this discussion."
+                  : "Please login to comment on this lesson"}
               </p>
               <a href="/login" className="btn-primary">
                 Login
@@ -353,11 +398,11 @@ const LessonDetailsPage = () => {
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select a reason</option>
-                  <option value="Inappropriate">Inappropriate Content</option>
-                  <option value="Spam">Spam</option>
-                  <option value="Offensive">Offensive</option>
-                  <option value="Misinformation">Misinformation</option>
-                  <option value="Other">Other</option>
+                  {REPORT_REASONS.map((reason) => (
+                    <option key={reason} value={reason}>
+                      {reason}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>

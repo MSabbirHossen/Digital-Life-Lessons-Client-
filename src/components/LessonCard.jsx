@@ -1,14 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export const LessonCard = ({ lesson, onFavoriteClick }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const isLocked = lesson.accessLevel === "Premium" && user && !user.isPremium;
+  const isOwner = user?._id === lesson.userId?._id;
+  const isLocked =
+    lesson.accessLevel === "Premium" &&
+    !user?.isPremium &&
+    user?.role !== "admin" &&
+    !isOwner;
 
   return (
-    <Link to={`/lessons/${lesson._id}`}>
-      <div className="card p-4 h-full flex flex-col overflow-hidden">
+    <article
+      onClick={() => navigate(`/lessons/${lesson._id}`)}
+      className="card p-4 h-full flex flex-col overflow-hidden cursor-pointer"
+    >
         {/* Image Container */}
         <div className="mb-4 relative">
           <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
@@ -47,7 +55,9 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
             {lesson.title}
           </h3>
           <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-            {lesson.description}
+            {isLocked
+              ? "Premium lesson. Upgrade to read the full reflection."
+              : lesson.description}
           </p>
 
           {/* Category and Tone */}
@@ -70,7 +80,7 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
           {user && (
             <button
               onClick={(e) => {
-                e.preventDefault();
+                e.stopPropagation();
                 onFavoriteClick?.(lesson._id);
               }}
               className="text-secondary hover:text-secondary/80"
@@ -82,9 +92,18 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
 
         {/* Author */}
         <div className="mt-3 pt-3 border-t text-sm text-gray-600">
-          <p>By {lesson.userId?.name || "Unknown"}</p>
+          {lesson.userId?._id ? (
+            <Link
+              to={`/profile/${lesson.userId._id}`}
+              onClick={(event) => event.stopPropagation()}
+              className="hover:text-primary"
+            >
+              By {lesson.userId?.name || "Unknown"}
+            </Link>
+          ) : (
+            <p>By Unknown</p>
+          )}
         </div>
-      </div>
-    </Link>
+    </article>
   );
 };

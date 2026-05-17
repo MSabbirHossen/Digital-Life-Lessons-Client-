@@ -11,6 +11,13 @@ const AdminDashboardPage = () => {
     totalLessons: 0,
     premiumUsers: 0,
     totalReports: 0,
+    publicLessons: 0,
+    privateLessons: 0,
+    activeContributors: 0,
+    newLessons: 0,
+    topCategories: [],
+    userGrowth: [],
+    lessonGrowth: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -20,17 +27,8 @@ const AdminDashboardPage = () => {
 
   const fetchStats = async () => {
     try {
-      // Fetch stats from various endpoints
-      const usersRes = await api.get("/auth/admin/users?limit=1");
-      const lessonsRes = await api.get("/lessons/public?limit=1");
-      const reportsRes = await api.get("/lessons/admin/reports/all?limit=1");
-
-      setStats({
-        totalUsers: usersRes.data.pagination?.total || 0,
-        totalLessons: lessonsRes.data.pagination?.total || 0,
-        premiumUsers: 0, // Can be calculated from users data
-        totalReports: reportsRes.data.pagination?.total || 0,
-      });
+      const response = await api.get("/auth/admin/analytics");
+      setStats(response.data.analytics);
     } catch (error) {
       console.error("Error fetching stats:", error);
       toast.error("Failed to load statistics");
@@ -86,6 +84,80 @@ const AdminDashboardPage = () => {
             <p className="text-3xl font-bold text-primary">
               {stats.totalReports}
             </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold mb-4">Lesson Mix</h2>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Public lessons</span>
+                <span className="font-semibold">{stats.publicLessons}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Private lessons</span>
+                <span className="font-semibold">{stats.privateLessons}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">New in 30 days</span>
+                <span className="font-semibold">{stats.newLessons}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Active contributors</span>
+                <span className="font-semibold">
+                  {stats.activeContributors}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold mb-4">Top Categories</h2>
+            <div className="space-y-3">
+              {stats.topCategories?.length ? (
+                stats.topCategories.map((category) => (
+                  <div key={category._id} className="flex justify-between">
+                    <span className="text-gray-600">{category._id}</span>
+                    <span className="font-semibold">{category.count}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-600">No category data yet.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold mb-4">30-Day Growth</h2>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-2">Users</p>
+                <div className="flex items-end gap-1 h-20">
+                  {(stats.userGrowth || []).slice(-14).map((item) => (
+                    <div
+                      key={item._id}
+                      title={`${item._id}: ${item.count}`}
+                      className="bg-primary rounded-t flex-1 min-w-2"
+                      style={{ height: `${Math.max(12, item.count * 12)}px` }}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-2">Lessons</p>
+                <div className="flex items-end gap-1 h-20">
+                  {(stats.lessonGrowth || []).slice(-14).map((item) => (
+                    <div
+                      key={item._id}
+                      title={`${item._id}: ${item.count}`}
+                      className="bg-secondary rounded-t flex-1 min-w-2"
+                      style={{ height: `${Math.max(12, item.count * 12)}px` }}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

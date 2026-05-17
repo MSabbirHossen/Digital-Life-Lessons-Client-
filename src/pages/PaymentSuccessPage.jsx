@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
-  const { setIsPremium } = useAuth();
+  const { setIsPremium, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [verified, setVerified] = useState(false);
 
@@ -26,6 +26,8 @@ const PaymentSuccessPage = () => {
       const response = await api.post("/stripe/verify-payment", { sessionId });
       if (response.data.user) {
         setIsPremium(response.data.user.isPremium);
+        setUser(response.data.user);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         setVerified(true);
         toast.success("Payment verified successfully!");
       }

@@ -2,27 +2,7 @@ import { useState, useEffect } from "react";
 import { useLessons } from "../hooks/useLessons";
 import { useFavorites } from "../hooks/useInteractions";
 import { LessonCard } from "../components/LessonCard";
-
-const CATEGORIES = [
-  "Personal Growth",
-  "Career",
-  "Relationships",
-  "Health",
-  "Finance",
-  "Spirituality",
-  "Learning",
-  "Other",
-];
-
-const TONES = [
-  "Inspiring",
-  "Thoughtful",
-  "Cautionary",
-  "Joyful",
-  "Reflective",
-  "Humorous",
-  "Profound",
-];
+import { EMOTIONAL_TONES, LESSON_CATEGORIES } from "../constants/lessons";
 
 const PublicLessons = () => {
   const { lessons, loading, pagination, getPublicLessons } = useLessons();
@@ -94,7 +74,7 @@ const PublicLessons = () => {
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
               >
                 <option value="">All Categories</option>
-                {CATEGORIES.map((cat) => (
+                {LESSON_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
                   </option>
@@ -111,7 +91,7 @@ const PublicLessons = () => {
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
               >
                 <option value="">All Tones</option>
-                {TONES.map((tone) => (
+                {EMOTIONAL_TONES.map((tone) => (
                   <option key={tone} value={tone}>
                     {tone}
                   </option>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const ManageUsersPage = () => {
   const [users, setUsers] = useState([]);
@@ -27,7 +28,15 @@ const ManageUsersPage = () => {
   };
 
   const handlePromoteAdmin = async (userId) => {
-    if (window.confirm("Promote this user to admin?")) {
+    const result = await Swal.fire({
+      title: "Promote this user?",
+      text: "They will receive admin access to moderation tools.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Promote",
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.post("/auth/admin/promote", { userId });
         toast.success("User promoted to admin");
@@ -39,7 +48,16 @@ const ManageUsersPage = () => {
   };
 
   const handleDeleteUser = async (userId) => {
-    if (window.confirm("Delete this user? This action cannot be undone.")) {
+    const result = await Swal.fire({
+      title: "Delete this user?",
+      text: "Their lessons, comments, favorites, and reports will be removed.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      confirmButtonColor: "#dc2626",
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.post("/auth/admin/delete-user", { userId });
         toast.success("User deleted successfully");

@@ -4,6 +4,7 @@ import { useLessons } from "../hooks/useLessons";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import api from "../services/api";
+import Swal from "sweetalert2";
 
 const MyLessonsPage = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const MyLessonsPage = () => {
     setLoading(true);
     try {
       const response = await api.get("/lessons/user/my-lessons");
-      setLessons(response.data);
+      setLessons(response.data.lessons || []);
     } catch (error) {
       toast.error("Failed to fetch your lessons");
     } finally {
@@ -28,7 +29,16 @@ const MyLessonsPage = () => {
   };
 
   const handleDelete = async (lessonId) => {
-    if (window.confirm("Are you sure you want to delete this lesson?")) {
+    const result = await Swal.fire({
+      title: "Delete this lesson?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      confirmButtonColor: "#dc2626",
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.delete(`/lessons/${lessonId}`);
         setLessons(lessons.filter((l) => l._id !== lessonId));

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const ReportedLessonsPage = () => {
   const [reports, setReports] = useState([]);
@@ -38,11 +39,16 @@ const ReportedLessonsPage = () => {
   };
 
   const handleDeleteLesson = async (lessonId) => {
-    if (
-      window.confirm(
-        "Delete this lesson? This action cannot be undone. All reports related to this lesson will be resolved.",
-      )
-    ) {
+    const result = await Swal.fire({
+      title: "Delete this lesson?",
+      text: "All reports related to this lesson will be removed.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      confirmButtonColor: "#dc2626",
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.delete(`/lessons/admin/reports/${lessonId}/delete`);
         toast.success("Lesson deleted successfully");

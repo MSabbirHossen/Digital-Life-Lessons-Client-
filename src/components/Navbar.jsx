@@ -58,6 +58,11 @@ export const Navbar = () => {
                     Upgrade
                   </Link>
                 )}
+                {user.isPremium && (
+                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">
+                    Premium
+                  </span>
+                )}
                 {user.role === "admin" && (
                   <Link to="/dashboard/admin" className="btn-primary text-sm">
                     Admin

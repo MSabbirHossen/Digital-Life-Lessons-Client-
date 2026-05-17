@@ -1,23 +1,34 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const ManageLessonsPage = () => {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [filters, setFilters] = useState({
+    search: "",
+    visibility: "",
+    accessLevel: "",
+    featured: "",
+  });
 
   useEffect(() => {
     fetchLessons();
-  }, [page]);
+  }, [page, filters]);
 
   const fetchLessons = async () => {
     setLoading(true);
     try {
-      const response = await api.get(`/lessons/public?page=${page}&limit=10`);
+      const response = await api.get("/lessons/admin/all", {
+        params: { page, limit: 10, ...filters },
+      });
       setLessons(response.data.lessons);
       setPagination(response.data.pagination);
+      setStats(response.data.stats);
     } catch (error) {
       toast.error("Failed to fetch lessons");
     } finally {
@@ -25,8 +36,39 @@ const ManageLessonsPage = () => {
     }
   };
 
+  const handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    setFilters((previous) => ({ ...previous, [name]: value }));
+    setPage(1);
+  };
+
+  const handleToggleFeatured = async (lesson) => {
+    try {
+      await api.patch(`/lessons/admin/${lesson._id}/featured`, {
+        isFeatured: !lesson.isFeatured,
+      });
+      toast.success(
+        lesson.isFeatured
+          ? "Lesson removed from featured"
+          : "Lesson marked as featured",
+      );
+      fetchLessons();
+    } catch (error) {
+      toast.error("Failed to update featured status");
+    }
+  };
+
   const handleDeleteLesson = async (lessonId) => {
-    if (window.confirm("Delete this lesson? This action cannot be undone.")) {
+    const result = await Swal.fire({
+      title: "Delete this lesson?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      confirmButtonColor: "#dc2626",
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.delete(`/lessons/${lessonId}`);
         toast.success("Lesson deleted successfully");
@@ -50,6 +92,69 @@ const ManageLessonsPage = () => {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-primary">Manage Lessons</h1>
 
+        {stats && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white rounded-lg shadow p-4">
+              <p className="text-gray-600 text-sm">Public</p>
+              <p className="text-2xl font-bold">{stats.publicLessons}</p>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4">
+              <p className="text-gray-600 text-sm">Private</p>
+              <p className="text-2xl font-bold">{stats.privateLessons}</p>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4">
+              <p className="text-gray-600 text-sm">Premium</p>
+              <p className="text-2xl font-bold">{stats.premiumLessons}</p>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4">
+              <p className="text-gray-600 text-sm">Featured</p>
+              <p className="text-2xl font-bold">{stats.featuredLessons}</p>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <input
+              name="search"
+              value={filters.search}
+              onChange={handleFilterChange}
+              placeholder="Search lessons"
+              className="px-4 py-2 border rounded-lg"
+            />
+            <select
+              name="visibility"
+              value={filters.visibility}
+              onChange={handleFilterChange}
+              className="px-4 py-2 border rounded-lg"
+            >
+              <option value="">All visibility</option>
+              <option value="Public">Public</option>
+              <option value="Private">Private</option>
+            </select>
+            <select
+              name="accessLevel"
+              value={filters.accessLevel}
+              onChange={handleFilterChange}
+              className="px-4 py-2 border rounded-lg"
+            >
+              <option value="">All access levels</option>
+              <option value="Free">Free</option>
+              <option value="Premium">Premium</option>
+            </select>
+            <select
+              name="featured"
+              value={filters.featured}
+              onChange={handleFilterChange}
+              className="px-4 py-2 border rounded-lg"
+            >
+              <option value="">Featured and regular</option>
+              <option value="true">Featured only</option>
+              <option value="false">Not featured</option>
+            </select>
+          </div>
+        </div>
+
         {/* Lessons Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
@@ -59,7 +164,9 @@ const ManageLessonsPage = () => {
                   <th className="text-left p-4">Title</th>
                   <th className="text-left p-4">Author</th>
                   <th className="text-left p-4">Category</th>
+                  <th className="text-left p-4">Visibility</th>
                   <th className="text-left p-4">Access Level</th>
+                  <th className="text-left p-4">Featured</th>
                   <th className="text-left p-4">Views</th>
                   <th className="text-left p-4">Created</th>
                   <th className="text-left p-4">Actions</th>
@@ -75,6 +182,7 @@ const ManageLessonsPage = () => {
                     </td>
                     <td className="p-4">{lesson.userId?.name}</td>
                     <td className="p-4">{lesson.category}</td>
+                    <td className="p-4">{lesson.visibility}</td>
                     <td className="p-4">
                       <span
                         className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -86,17 +194,37 @@ const ManageLessonsPage = () => {
                         {lesson.accessLevel}
                       </span>
                     </td>
+                    <td className="p-4">
+                      <button
+                        onClick={() => handleToggleFeatured(lesson)}
+                        className={`px-3 py-1 rounded text-sm font-semibold ${
+                          lesson.isFeatured
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {lesson.isFeatured ? "Featured" : "Feature"}
+                      </button>
+                    </td>
                     <td className="p-4">{lesson.views || 0}</td>
                     <td className="p-4 text-sm">
                       {new Date(lesson.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-4">
-                      <button
-                        onClick={() => handleDeleteLesson(lesson._id)}
-                        className="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-sm"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex gap-2">
+                        <a
+                          href={`/lessons/${lesson._id}`}
+                          className="px-3 py-1 bg-primary/10 text-primary rounded hover:bg-primary/20 text-sm"
+                        >
+                          View
+                        </a>
+                        <button
+                          onClick={() => handleDeleteLesson(lesson._id)}
+                          className="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-sm"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

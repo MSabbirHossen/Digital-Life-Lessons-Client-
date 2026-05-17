@@ -17,10 +17,18 @@ const Home = () => {
 
   const fetchFeaturedLessons = async () => {
     try {
-      const response = await api.get("/lessons/public", {
-        params: { limit: 6, sort: "newest" },
+      const response = await api.get("/lessons/featured", {
+        params: { limit: 6 },
       });
-      setFeaturedLessons(response.data.lessons);
+      if (response.data.lessons?.length) {
+        setFeaturedLessons(response.data.lessons);
+        return;
+      }
+
+      const fallback = await api.get("/lessons/public", {
+        params: { limit: 6, sort: "mostSaved" },
+      });
+      setFeaturedLessons(fallback.data.lessons);
     } catch (error) {
       console.error("Error fetching featured lessons:", error);
     } finally {
@@ -120,7 +128,7 @@ const Home = () => {
       <section className="py-20 px-4 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12">
-            Latest Life Lessons
+            Featured Life Lessons
           </h2>
 
           {loading ? (
