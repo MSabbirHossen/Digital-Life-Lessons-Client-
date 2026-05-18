@@ -55,7 +55,7 @@ npm install
    Create a `.env.local` file based on `.env.example`:
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_BASE_URL=http://localhost:5000/api
 VITE_FIREBASE_API_KEY=your_firebase_key
 VITE_FIREBASE_AUTH_DOMAIN=your_firebase_domain
 VITE_FIREBASE_PROJECT_ID=your_firebase_project
@@ -234,7 +234,7 @@ Create `.env.development.local` for development:
 
 ```env
 VITE_DEBUG=true
-VITE_API_URL=http://localhost:5000/api
+VITE_API_BASE_URL=http://localhost:5000/api
 ```
 
 ## 📝 Linting
