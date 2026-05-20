@@ -7,6 +7,12 @@ import api from "../services/api";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { REPORT_REASONS } from "../constants/lessons";
+import {
+  FacebookShareButton,
+  LinkedinShareButton,
+  TwitterShareButton,
+} from "react-share";
+import { LessonCard } from "../components/LessonCard";
 
 const LessonDetailsPage = () => {
   const { id } = useParams();
@@ -24,6 +30,7 @@ const LessonDetailsPage = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportData, setReportData] = useState({ reason: "", description: "" });
   const [isPremiumBlocked, setIsPremiumBlocked] = useState(false);
+  const [similarLessons, setSimilarLessons] = useState([]);
 
   useEffect(() => {
     fetchLesson();
@@ -38,12 +45,22 @@ const LessonDetailsPage = () => {
         setLesson(lessonData.lesson);
         setComments(lessonData.comments || []);
         setIsPremiumBlocked(Boolean(lessonData.isPremiumBlocked));
+        fetchSimilarLessons();
       }
     } catch (error) {
       toast.error("Failed to load lesson");
       navigate("/lessons");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSimilarLessons = async () => {
+    try {
+      const response = await api.get(`/lessons/${id}/similar`);
+      setSimilarLessons(response.data.lessons || []);
+    } catch (error) {
+      console.error("Error fetching similar lessons:", error);
     }
   };
 
@@ -157,6 +174,7 @@ const LessonDetailsPage = () => {
 
   const isOwner = user?._id === lesson.userId?._id;
   const canModerate = user?.role === "admin" || isOwner;
+  const shareUrl = window.location.href;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
@@ -189,13 +207,13 @@ const LessonDetailsPage = () => {
                     : "bg-gray-100 text-gray-600"
                 }`}
               >
-                {isFavorited ? "❤️" : "🤍"} Save
+                {isFavorited ? "Saved" : "Save"}
               </button>
               <button
                 onClick={handleLike}
                 className="px-4 py-2 rounded-lg bg-blue-100 text-blue-600 flex items-center gap-2"
               >
-                👍 {lesson.likesCount || 0}
+                Like {lesson.likesCount || 0}
               </button>
             </div>
           </div>
@@ -217,7 +235,7 @@ const LessonDetailsPage = () => {
                 {lesson.userId?.name}
               </Link>
               <p className="text-gray-600 text-sm">
-                {new Date(lesson.createdAt).toLocaleDateString()} •{" "}
+                {new Date(lesson.createdAt).toLocaleDateString()} |{" "}
                 {lesson.views || 0} views
               </p>
             </div>
@@ -254,12 +272,27 @@ const LessonDetailsPage = () => {
 
           {lesson.accessLevel === "Premium" && (
             <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <p className="text-yellow-800 text-sm">⭐ Premium Content</p>
+              <p className="text-yellow-800 text-sm">Premium Content</p>
             </div>
           )}
 
+          <div className="mt-6 grid grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-3">
+            <div className="rounded-lg bg-gray-50 p-3">
+              <span className="font-semibold">Visibility:</span>{" "}
+              {lesson.visibility}
+            </div>
+            <div className="rounded-lg bg-gray-50 p-3">
+              <span className="font-semibold">Updated:</span>{" "}
+              {new Date(lesson.updatedAt).toLocaleDateString()}
+            </div>
+            <div className="rounded-lg bg-gray-50 p-3">
+              <span className="font-semibold">Saves:</span>{" "}
+              {lesson.favoritesCount || 0}
+            </div>
+          </div>
+
           {/* Action Buttons */}
-          <div className="mt-8 flex gap-4">
+          <div className="mt-8 flex flex-wrap gap-4">
             {canModerate ? (
               <>
                 <button
@@ -301,6 +334,21 @@ const LessonDetailsPage = () => {
             >
               Report
             </button>
+            <FacebookShareButton url={shareUrl} quote={lesson.title}>
+              <span className="inline-block rounded-lg bg-blue-50 px-4 py-2 text-blue-700">
+                Facebook
+              </span>
+            </FacebookShareButton>
+            <TwitterShareButton url={shareUrl} title={lesson.title}>
+              <span className="inline-block rounded-lg bg-gray-100 px-4 py-2 text-gray-700">
+                X
+              </span>
+            </TwitterShareButton>
+            <LinkedinShareButton url={shareUrl} title={lesson.title}>
+              <span className="inline-block rounded-lg bg-sky-50 px-4 py-2 text-sky-700">
+                LinkedIn
+              </span>
+            </LinkedinShareButton>
           </div>
         </div>
 
@@ -378,6 +426,17 @@ const LessonDetailsPage = () => {
             )}
           </div>
         </div>
+
+        {similarLessons.length > 0 && (
+          <div className="mt-8">
+            <h2 className="mb-6 text-2xl font-bold">Similar Lessons</h2>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {similarLessons.map((similar) => (
+                <LessonCard key={similar._id} lesson={similar} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Report Modal */}
