@@ -1,94 +1,89 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import { toast } from "react-toastify";
 
 const PaymentSuccessPage = () => {
-  const [searchParams] = useSearchParams();
   const { setIsPremium, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [verified, setVerified] = useState(false);
+  const [activated, setActivated] = useState(false);
 
   useEffect(() => {
-    verifyPayment();
+    pollPremiumStatus();
   }, []);
 
-  const verifyPayment = async () => {
-    try {
-      const sessionId = searchParams.get("session_id");
-      if (!sessionId) {
-        toast.error("Invalid session");
-        setLoading(false);
-        return;
+  const pollPremiumStatus = async () => {
+    let attempts = 0;
+    const maxAttempts = 8;
+
+    while (attempts < maxAttempts) {
+      try {
+        const response = await api.get("/stripe/payment-status");
+        if (response.data.isPremium) {
+          const profile = await api.get("/auth/me");
+          setIsPremium(true);
+          setUser(profile.data.user);
+          localStorage.setItem("user", JSON.stringify(profile.data.user));
+          setActivated(true);
+          toast.success("Premium activated successfully");
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error("Payment status polling failed:", error);
       }
 
-      const response = await api.post("/stripe/verify-payment", { sessionId });
-      if (response.data.user) {
-        setIsPremium(response.data.user.isPremium);
-        setUser(response.data.user);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        setVerified(true);
-        toast.success("Payment verified successfully!");
-      }
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Payment verification failed",
-      );
-    } finally {
-      setLoading(false);
+      attempts += 1;
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
+
+    setLoading(false);
+    toast.info("Payment received. Premium activation may take a moment.");
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="loader"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-12 text-center">
-          <div className="text-6xl mb-6">✅</div>
-          <h1 className="text-4xl font-bold mb-4 text-green-600">
-            Payment Successful!
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 px-4 py-12">
+      <div className="mx-auto max-w-2xl">
+        <div className="rounded-lg bg-white p-8 text-center shadow-lg sm:p-12">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-3xl text-green-700">
+            OK
+          </div>
+          <h1 className="mb-4 text-4xl font-bold text-green-700">
+            Payment Successful
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            {verified
-              ? "Thank you for upgrading to Premium. Your account has been activated with all premium features."
-              : "Your payment is being processed. Please wait while we verify your transaction."}
+          <p className="mb-8 text-lg text-gray-600">
+            {loading
+              ? "Stripe is confirming your payment. Premium will activate automatically through the secure webhook."
+              : activated
+                ? "Your Premium membership is active."
+                : "Your payment was received, but the webhook has not finished activation yet. Refresh this page in a moment or check your dashboard."}
           </p>
 
-          {verified && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 text-left">
-              <h3 className="font-bold text-lg mb-4 text-green-800">
-                🎉 You're now a Premium Member!
+          {activated && (
+            <div className="mb-8 rounded-lg border border-green-200 bg-green-50 p-6 text-left">
+              <h3 className="mb-4 text-lg font-bold text-green-800">
+                Premium benefits unlocked
               </h3>
               <ul className="space-y-2 text-gray-700">
-                <li>✓ Access all premium lessons</li>
-                <li>✓ Create unlimited premium lessons</li>
-                <li>✓ Premium badge on your profile</li>
-                <li>✓ Priority support</li>
-                <li>✓ Lifetime access (one-time payment)</li>
+                <li>Access all premium lessons</li>
+                <li>Create premium lessons</li>
+                <li>Premium badge on your profile</li>
+                <li>Lifetime access with one-time payment</li>
               </ul>
             </div>
           )}
 
-          <div className="flex flex-col gap-4">
+          {loading && <div className="loader mx-auto mb-8"></div>}
+
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Link to="/dashboard" className="btn-primary">
               Go to Dashboard
             </Link>
             <Link to="/dashboard/add-lesson" className="btn-secondary">
-              Create Premium Lesson
+              Create Lesson
             </Link>
           </div>
-
-          <p className="text-gray-600 mt-8 text-sm">
-            A confirmation email has been sent to your registered email address.
-          </p>
         </div>
       </div>
     </div>
