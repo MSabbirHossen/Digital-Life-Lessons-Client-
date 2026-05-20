@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { FaTwitter, FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 
 export const Footer = () => {
   return (
@@ -58,15 +59,27 @@ export const Footer = () => {
           {/* Social */}
           <div>
             <h4 className="font-semibold mb-4">Follow Us</h4>
-            <div className="flex space-x-4">
-              <a href="#" className="hover:text-primary transition">
-                𝕏 (Twitter)
+            <div className="flex space-x-3">
+              <a
+                href="#"
+                aria-label="Twitter"
+                className="inline-flex h-10 w-10 items-center justify-center rounded bg-white/5 text-white hover:bg-white/10 transition"
+              >
+                <FaTwitter />
               </a>
-              <a href="#" className="hover:text-primary transition">
-                Facebook
+              <a
+                href="#"
+                aria-label="Facebook"
+                className="inline-flex h-10 w-10 items-center justify-center rounded bg-white/5 text-white hover:bg-white/10 transition"
+              >
+                <FaFacebookF />
               </a>
-              <a href="#" className="hover:text-primary transition">
-                LinkedIn
+              <a
+                href="#"
+                aria-label="LinkedIn"
+                className="inline-flex h-10 w-10 items-center justify-center rounded bg-white/5 text-white hover:bg-white/10 transition"
+              >
+                <FaLinkedinIn />
               </a>
             </div>
           </div>

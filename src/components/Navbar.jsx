@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { FaMoon, FaSun } from "react-icons/fa";
 
 const linkClass = ({ isActive }) =>
   `text-sm font-medium transition ${
@@ -11,6 +12,30 @@ export const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === "undefined") return "light";
+    return (
+      localStorage.getItem("theme") ||
+      (window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light")
+    );
+  });
+
+  // Apply theme class on mount
+  useEffect(() => {
+    if (theme === "dark") document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+  }, [theme]);
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    if (next === "dark") document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+    localStorage.setItem("theme", next);
+  };
 
   const handleLogout = () => {
     logout();
@@ -50,12 +75,19 @@ export const Navbar = () => {
                 {item.label}
               </NavLink>
             ))}
-            {user &&
-              privateLinks.map((item) => (
-                <NavLink key={item.to} to={item.to} className={linkClass}>
-                  {item.label}
-                </NavLink>
-              ))}
+            {privateLinks.map((item) => (
+              <NavLink
+                key={item.to}
+                to={
+                  user
+                    ? item.to
+                    : `/login?redirect=${encodeURIComponent(item.to)}`
+                }
+                className={linkClass}
+              >
+                {item.label}
+              </NavLink>
+            ))}
             {user?.role === "admin" && (
               <NavLink to="/dashboard/admin" className={linkClass}>
                 Admin
@@ -64,6 +96,13 @@ export const Navbar = () => {
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
+            <button
+              onClick={toggleTheme}
+              className="text-gray-600 mr-2"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <FaSun /> : <FaMoon />}
+            </button>
             {!user ? (
               <>
                 <Link to="/login" className="btn-ghost text-sm">
@@ -134,17 +173,20 @@ export const Navbar = () => {
                 {item.label}
               </NavLink>
             ))}
-            {user &&
-              privateLinks.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  onClick={closeMenu}
-                  className={linkClass}
-                >
-                  {item.label}
-                </NavLink>
-              ))}
+            {privateLinks.map((item) => (
+              <NavLink
+                key={item.to}
+                to={
+                  user
+                    ? item.to
+                    : `/login?redirect=${encodeURIComponent(item.to)}`
+                }
+                onClick={closeMenu}
+                className={linkClass}
+              >
+                {item.label}
+              </NavLink>
+            ))}
             {user?.role === "admin" && (
               <NavLink
                 to="/dashboard/admin"
@@ -157,10 +199,18 @@ export const Navbar = () => {
             <div className="mt-2 flex flex-col gap-2 border-t border-gray-100 pt-3">
               {!user ? (
                 <>
-                  <Link to="/login" onClick={closeMenu} className="btn-ghost text-center">
+                  <Link
+                    to="/login"
+                    onClick={closeMenu}
+                    className="btn-ghost text-center"
+                  >
                     Login
                   </Link>
-                  <Link to="/register" onClick={closeMenu} className="btn-primary text-center">
+                  <Link
+                    to="/register"
+                    onClick={closeMenu}
+                    className="btn-primary text-center"
+                  >
                     Signup
                   </Link>
                 </>
@@ -174,7 +224,11 @@ export const Navbar = () => {
                     {user.name} {user.isPremium ? "(Premium)" : "(Free)"}
                   </Link>
                   {!user.isPremium && (
-                    <Link to="/pricing" onClick={closeMenu} className="btn-secondary text-center">
+                    <Link
+                      to="/pricing"
+                      onClick={closeMenu}
+                      className="btn-secondary text-center"
+                    >
                       Upgrade
                     </Link>
                   )}

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -10,11 +11,13 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,7 +31,11 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       toast.success("Logged in successfully!");
-      navigate("/");
+      const redirect =
+        new URLSearchParams(location.search).get("redirect") ||
+        location.state?.from ||
+        "/";
+      navigate(redirect);
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -42,7 +49,11 @@ const Login = () => {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       toast.success("Logged in with Google!");
-      navigate("/");
+      const redirect =
+        new URLSearchParams(location.search).get("redirect") ||
+        location.state?.from ||
+        "/";
+      navigate(redirect);
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -77,15 +88,25 @@ const Login = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
 
             <button

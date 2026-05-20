@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate, Link } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
@@ -18,6 +19,7 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const validatePassword = (password) => {
     const hasUppercase = /[A-Z]/.test(password);
@@ -62,7 +64,7 @@ const Register = () => {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
-        formData.password,
+        formData.password
       );
 
       await updateProfile(userCredential.user, {
@@ -100,14 +102,12 @@ const Register = () => {
             Create Account
           </h1>
           <p className="text-center text-gray-600 mb-8">
-            Share your wisdom with the world
+            Share your life lessons with the world
           </p>
 
           <form onSubmit={handleEmailRegister} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">
-                Full Name
-              </label>
+              <label className="block text-sm font-medium mb-2">Full Name</label>
               <input
                 type="text"
                 name="name"
@@ -134,18 +134,25 @@ const Register = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
-                placeholder="••••••••"
-                required
-              />
-              <p className="text-xs text-gray-600 mt-1">
-                Must have uppercase, lowercase, and be at least 6 characters
-              </p>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
 
             <div>
@@ -153,7 +160,7 @@ const Register = () => {
                 Confirm Password
               </label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -168,7 +175,7 @@ const Register = () => {
               disabled={loading}
               className="w-full btn-primary disabled:opacity-50"
             >
-              {loading ? "Creating account..." : "Register"}
+              {loading ? "Creating Account..." : "Register"}
             </button>
           </form>
 
@@ -178,7 +185,7 @@ const Register = () => {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white text-gray-500">
-                Or sign up with
+                Or continue with
               </span>
             </div>
           </div>
