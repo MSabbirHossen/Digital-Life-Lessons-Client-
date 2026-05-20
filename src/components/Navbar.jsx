@@ -1,158 +1,195 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
+const linkClass = ({ isActive }) =>
+  `text-sm font-medium transition ${
+    isActive ? "text-primary" : "text-gray-700 hover:text-primary"
+  }`;
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
+    setIsMenuOpen(false);
     navigate("/");
-    setIsDropdownOpen(false);
   };
 
+  const publicLinks = [
+    { to: "/", label: "Home" },
+    { to: "/lessons", label: "Public Lessons" },
+  ];
+
+  const privateLinks = [
+    { to: "/dashboard/add-lesson", label: "Add Lesson" },
+    { to: "/dashboard/my-lessons", label: "My Lessons" },
+    { to: "/dashboard/my-favorites", label: "Favorites" },
+    { to: "/dashboard", label: "Dashboard" },
+  ];
+
+  const closeMenu = () => setIsMenuOpen(false);
+
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="font-bold text-2xl text-primary">
-            📚 Digital Life Lessons
+    <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          <Link
+            to="/"
+            onClick={closeMenu}
+            className="text-xl font-bold text-primary sm:text-2xl"
+          >
+            Digital Life Lessons
           </Link>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
-            {user ? (
+          <div className="hidden items-center gap-6 md:flex">
+            {publicLinks.map((item) => (
+              <NavLink key={item.to} to={item.to} className={linkClass}>
+                {item.label}
+              </NavLink>
+            ))}
+            {user &&
+              privateLinks.map((item) => (
+                <NavLink key={item.to} to={item.to} className={linkClass}>
+                  {item.label}
+                </NavLink>
+              ))}
+            {user?.role === "admin" && (
+              <NavLink to="/dashboard/admin" className={linkClass}>
+                Admin
+              </NavLink>
+            )}
+          </div>
+
+          <div className="hidden items-center gap-3 md:flex">
+            {!user ? (
               <>
-                <Link to="/" className="text-gray-700 hover:text-primary">
-                  Home
+                <Link to="/login" className="btn-ghost text-sm">
+                  Login
                 </Link>
-                <Link
-                  to="/lessons"
-                  className="text-gray-700 hover:text-primary"
-                >
-                  Lessons
+                <Link to="/register" className="btn-primary text-sm">
+                  Signup
                 </Link>
-                <Link
-                  to="/dashboard/add-lesson"
-                  className="text-gray-700 hover:text-primary"
-                >
-                  Create
-                </Link>
-                <Link
-                  to="/dashboard/my-lessons"
-                  className="text-gray-700 hover:text-primary"
-                >
-                  My Lessons
-                </Link>
-                <Link
-                  to="/dashboard/my-favorites"
-                  className="text-gray-700 hover:text-primary"
-                >
-                  Favorites
-                </Link>
+              </>
+            ) : (
+              <>
                 {!user.isPremium && (
                   <Link to="/pricing" className="btn-secondary text-sm">
                     Upgrade
                   </Link>
                 )}
                 {user.isPremium && (
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">
+                  <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-800">
                     Premium
                   </span>
                 )}
-                {user.role === "admin" && (
-                  <Link to="/dashboard/admin" className="btn-primary text-sm">
-                    Admin
-                  </Link>
-                )}
-
-                {/* User Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center space-x-2"
-                  >
-                    {user.photoURL && (
-                      <img
-                        src={user.photoURL}
-                        alt={user.name}
-                        className="w-10 h-10 rounded-full"
-                      />
-                    )}
-                    <span className="hidden sm:block">{user.name}</span>
-                  </button>
-
-                  {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg">
-                      <Link
-                        to="/dashboard/profile"
-                        onClick={() => setIsDropdownOpen(false)}
-                        className="block px-4 py-2 hover:bg-gray-100"
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        to="/dashboard"
-                        onClick={() => setIsDropdownOpen(false)}
-                        className="block px-4 py-2 hover:bg-gray-100"
-                      >
-                        Dashboard
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <Link to="/" className="text-gray-700 hover:text-primary">
-                  Home
-                </Link>
                 <Link
-                  to="/lessons"
-                  className="text-gray-700 hover:text-primary"
+                  to="/dashboard/profile"
+                  className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700"
                 >
-                  Lessons
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={user.name}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      {user.name?.charAt(0)?.toUpperCase() || "U"}
+                    </span>
+                  )}
+                  <span className="max-w-[120px] truncate">{user.name}</span>
                 </Link>
-                <Link to="/login" className="btn-primary text-sm">
-                  Login
-                </Link>
-                <Link to="/register" className="btn-secondary text-sm">
-                  Register
-                </Link>
+                <button onClick={handleLogout} className="text-sm text-red-600">
+                  Logout
+                </button>
               </>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
-            className="md:hidden"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 md:hidden"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMenuOpen}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
+            <span className="text-xl">{isMenuOpen ? "x" : "="}</span>
           </button>
         </div>
       </div>
+
+      {isMenuOpen && (
+        <div className="border-t border-gray-200 bg-white px-4 py-4 md:hidden">
+          <div className="flex flex-col gap-3">
+            {publicLinks.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={closeMenu}
+                className={linkClass}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+            {user &&
+              privateLinks.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={closeMenu}
+                  className={linkClass}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            {user?.role === "admin" && (
+              <NavLink
+                to="/dashboard/admin"
+                onClick={closeMenu}
+                className={linkClass}
+              >
+                Admin
+              </NavLink>
+            )}
+            <div className="mt-2 flex flex-col gap-2 border-t border-gray-100 pt-3">
+              {!user ? (
+                <>
+                  <Link to="/login" onClick={closeMenu} className="btn-ghost text-center">
+                    Login
+                  </Link>
+                  <Link to="/register" onClick={closeMenu} className="btn-primary text-center">
+                    Signup
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/dashboard/profile"
+                    onClick={closeMenu}
+                    className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium"
+                  >
+                    {user.name} {user.isPremium ? "(Premium)" : "(Free)"}
+                  </Link>
+                  {!user.isPremium && (
+                    <Link to="/pricing" onClick={closeMenu} className="btn-secondary text-center">
+                      Upgrade
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="rounded-lg bg-red-50 px-4 py-2 text-left text-sm font-semibold text-red-600"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
