@@ -1,5 +1,11 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext";
@@ -39,143 +45,160 @@ const PageLoader = () => (
 
 const AppShell = () => {
   const location = useLocation();
-  const hideChrome = location.pathname !== "/" && location.pathname.startsWith("/404");
+  const hideChrome = location.pathname === "/404";
 
   return (
     <div className="flex flex-col min-h-screen">
       {!hideChrome && <Navbar />}
       <main className="flex-grow">
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/lessons" element={<PublicLessons />} />
-            <Route path="/public-lessons" element={<PublicLessons />} />
-            <Route path="/lessons/:id" element={<LessonDetailsPage />} />
-            <Route path="/lesson/:id" element={<LessonDetailsPage />} />
-            <Route path="/profile/:userId" element={<AuthorProfilePage />} />
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/lessons" element={<PublicLessons />} />
+              <Route path="/public-lessons" element={<PublicLessons />} />
+              <Route
+                path="/lessons/:id"
+                element={
+                  <PrivateRoute>
+                    <LessonDetailsPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/lesson/:id"
+                element={
+                  <PrivateRoute>
+                    <LessonDetailsPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route path="/profile/:userId" element={<AuthorProfilePage />} />
 
-            {/* Private Routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard/add-lesson"
-              element={
-                <PrivateRoute>
-                  <AddLesson />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard/my-lessons"
-              element={
-                <PrivateRoute>
-                  <MyLessonsPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard/update-lesson/:id"
-              element={
-                <PrivateRoute>
-                  <UpdateLessonPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard/my-favorites"
-              element={
-                <PrivateRoute>
-                  <MyFavoritesPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard/profile"
-              element={
-                <PrivateRoute>
-                  <UserProfilePage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/pricing"
-              element={
-                <PrivateRoute>
-                  <PricingPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/payment/success"
-              element={
-                <PrivateRoute>
-                  <PaymentSuccessPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/payment/cancel"
-              element={
-                <PrivateRoute>
-                  <PaymentCancelPage />
-                </PrivateRoute>
-              }
-            />
+              {/* Private Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/dashboard/add-lesson"
+                element={
+                  <PrivateRoute>
+                    <AddLesson />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/dashboard/my-lessons"
+                element={
+                  <PrivateRoute>
+                    <MyLessonsPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/dashboard/update-lesson/:id"
+                element={
+                  <PrivateRoute>
+                    <UpdateLessonPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/dashboard/my-favorites"
+                element={
+                  <PrivateRoute>
+                    <MyFavoritesPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/dashboard/profile"
+                element={
+                  <PrivateRoute>
+                    <UserProfilePage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/pricing"
+                element={
+                  <PrivateRoute>
+                    <PricingPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/payment/success"
+                element={
+                  <PrivateRoute>
+                    <PaymentSuccessPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/payment/cancel"
+                element={
+                  <PrivateRoute>
+                    <PaymentCancelPage />
+                  </PrivateRoute>
+                }
+              />
 
-            {/* Admin Routes */}
-            <Route
-              path="/dashboard/admin"
-              element={
-                <AdminRoute>
-                  <AdminDashboardPage />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/dashboard/admin/manage-users"
-              element={
-                <AdminRoute>
-                  <ManageUsersPage />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/dashboard/admin/manage-lessons"
-              element={
-                <AdminRoute>
-                  <ManageLessonsPage />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/dashboard/admin/reported-lessons"
-              element={
-                <AdminRoute>
-                  <ReportedLessonsPage />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/dashboard/admin/profile"
-              element={
-                <AdminRoute>
-                  <AdminProfilePage />
-                </AdminRoute>
-              }
-            />
+              {/* Admin Routes */}
+              <Route
+                path="/dashboard/admin"
+                element={
+                  <AdminRoute>
+                    <AdminDashboardPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/manage-users"
+                element={
+                  <AdminRoute>
+                    <ManageUsersPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/manage-lessons"
+                element={
+                  <AdminRoute>
+                    <ManageLessonsPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/reported-lessons"
+                element={
+                  <AdminRoute>
+                    <ReportedLessonsPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/profile"
+                element={
+                  <AdminRoute>
+                    <AdminProfilePage />
+                  </AdminRoute>
+                }
+              />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+              <Route path="/404" element={<NotFound />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
+            </Routes>
+          </Suspense>
+        </div>
       </main>
       {!hideChrome && <Footer />}
     </div>
