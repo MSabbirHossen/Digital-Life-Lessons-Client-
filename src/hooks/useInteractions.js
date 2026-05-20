@@ -7,11 +7,11 @@ export const useFavorites = () => {
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
-  const getUserFavorites = useCallback(async (page = 1, limit = 9) => {
+  const getUserFavorites = useCallback(async (page = 1, limit = 9, filters = {}) => {
     setLoading(true);
     try {
       const response = await api.get("/lessons/favorites/my-favorites", {
-        params: { page, limit },
+        params: { page, limit, ...filters },
       });
       setFavorites(response.data.favorites || []);
       setPagination(response.data.pagination || null);
@@ -28,7 +28,7 @@ export const useFavorites = () => {
       toast.success("Added to favorites");
       return true;
     } catch (error) {
-      if (error.response?.status !== 400) {
+      if (![400, 409].includes(error.response?.status)) {
         toast.error(error.response?.data?.message || "Failed to add favorite");
       }
       return false;

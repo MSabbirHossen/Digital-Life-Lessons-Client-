@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "../hooks/useInteractions";
+import { EMOTIONAL_TONES, LESSON_CATEGORIES } from "../constants/lessons";
 
 const MyFavoritesPage = () => {
   const { favorites, loading, pagination, getUserFavorites, removeFavorite } =
     useFavorites();
   const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState({
+    category: "",
+    tone: "",
+    accessLevel: "",
+  });
 
   useEffect(() => {
-    getUserFavorites(page);
-  }, [page]);
+    getUserFavorites(page, 9, filters);
+  }, [page, filters]);
+
+  const handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    setFilters((current) => ({ ...current, [name]: value }));
+    setPage(1);
+  };
 
   const handleRemove = async (lessonId) => {
     const success = await removeFavorite(lessonId);
     if (success) {
-      await getUserFavorites(page);
+      await getUserFavorites(page, 9, filters);
     }
   };
 
@@ -28,6 +40,47 @@ const MyFavoritesPage = () => {
               {pagination.total} saved lesson{pagination.total === 1 ? "" : "s"}
             </p>
           )}
+        </div>
+
+        <div className="mb-8 rounded-lg bg-white p-6 shadow">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <select
+              name="category"
+              value={filters.category}
+              onChange={handleFilterChange}
+              className="rounded-lg border px-4 py-2"
+            >
+              <option value="">All Categories</option>
+              {LESSON_CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <select
+              name="tone"
+              value={filters.tone}
+              onChange={handleFilterChange}
+              className="rounded-lg border px-4 py-2"
+            >
+              <option value="">All Tones</option>
+              {EMOTIONAL_TONES.map((tone) => (
+                <option key={tone} value={tone}>
+                  {tone}
+                </option>
+              ))}
+            </select>
+            <select
+              name="accessLevel"
+              value={filters.accessLevel}
+              onChange={handleFilterChange}
+              className="rounded-lg border px-4 py-2"
+            >
+              <option value="">All Access Levels</option>
+              <option value="Free">Free</option>
+              <option value="Premium">Premium</option>
+            </select>
+          </div>
         </div>
 
         {loading ? (
