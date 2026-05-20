@@ -202,11 +202,19 @@ const UpdateLessonPage = () => {
                 name="accessLevel"
                 value={formData.accessLevel}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+                disabled={!user.isPremium && user.role !== "admin"}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary disabled:opacity-50"
               >
                 <option value="Free">Free</option>
-                <option value="Premium">Premium Only</option>
+                <option value="Premium" disabled={!user.isPremium && user.role !== "admin"}>
+                  Premium Only {!user.isPremium && user.role !== "admin" ? "(Upgrade to unlock)" : ""}
+                </option>
               </select>
+              {!user.isPremium && user.role !== "admin" && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Upgrade to Premium to publish premium lessons.
+                </p>
+              )}
             </div>
           </div>
 
