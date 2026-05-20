@@ -154,6 +154,33 @@ const LessonDetailsPage = () => {
     }
   };
 
+  const handleExportPDF = () => {
+    if (!lesson) return;
+    const printWindow = window.open("", "_blank");
+    const html = `
+      <html>
+        <head>
+          <title>${lesson.title}</title>
+          <style>body{font-family: Arial, sans-serif;padding:24px;color:#111} img{max-width:100%;height:auto} h1{color:#0f172a}</style>
+        </head>
+        <body>
+          <h1>${lesson.title}</h1>
+          <p><strong>Author:</strong> ${lesson.userId?.name || "Unknown"}</p>
+          <p><strong>Category:</strong> ${lesson.category}</p>
+          <hr />
+          <div>${lesson.description.replace(/\n/g, "<br/>")}</div>
+        </body>
+      </html>
+    `;
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -238,6 +265,17 @@ const LessonDetailsPage = () => {
                 {new Date(lesson.createdAt).toLocaleDateString()} |{" "}
                 {lesson.views || 0} views
               </p>
+              <p className="text-gray-600 text-sm">
+                Total lessons: {lesson.userId?.lessonsCreated || 0}
+              </p>
+            </div>
+            <div className="ml-auto">
+              <Link
+                to={`/profile/${lesson.userId?._id}`}
+                className="btn-secondary"
+              >
+                View all lessons by author
+              </Link>
             </div>
           </div>
 
@@ -329,10 +367,28 @@ const LessonDetailsPage = () => {
               </>
             ) : null}
             <button
+              onClick={handleFavoriteClick}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 ${isFavorited ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600"}`}
+            >
+              {isFavorited ? "Saved" : "Save"}
+            </button>
+            <button
+              onClick={handleLike}
+              className="px-4 py-2 rounded-lg bg-blue-100 text-blue-600 flex items-center gap-2"
+            >
+              Like {lesson.likesCount || 0}
+            </button>
+            <button
               onClick={() => setShowReportModal(true)}
               className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200"
             >
               Report
+            </button>
+            <button
+              onClick={() => handleExportPDF()}
+              className="px-4 py-2 bg-gray-50 text-gray-700 rounded-lg border"
+            >
+              Export as PDF
             </button>
             <FacebookShareButton url={shareUrl} quote={lesson.title}>
               <span className="inline-block rounded-lg bg-blue-50 px-4 py-2 text-blue-700">
