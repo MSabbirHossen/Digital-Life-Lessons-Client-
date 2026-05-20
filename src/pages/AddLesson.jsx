@@ -3,6 +3,43 @@ import { useNavigate } from "react-router-dom";
 import { useLessons } from "../hooks/useLessons";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import Lottie from "lottie-react";
+
+const successAnimation = {
+  v: "5.7.4",
+  fr: 30,
+  ip: 0,
+  op: 60,
+  w: 120,
+  h: 120,
+  nm: "success",
+  ddd: 0,
+  assets: [],
+  layers: [
+    {
+      ddd: 0,
+      ind: 1,
+      ty: 4,
+      nm: "circle",
+      sr: 1,
+      ks: {
+        o: { a: 0, k: 100 },
+        r: { a: 0, k: 0 },
+        p: { a: 0, k: [60, 60, 0] },
+        a: { a: 0, k: [0, 0, 0] },
+        s: { a: 1, k: [{ t: 0, s: [0, 0, 100] }, { t: 20, s: [100, 100, 100] }] },
+      },
+      shapes: [
+        { ty: "el", p: { a: 0, k: [0, 0] }, s: { a: 0, k: [90, 90] } },
+        { ty: "fl", c: { a: 0, k: [0.13, 0.73, 0.45, 1] }, o: { a: 0, k: 100 } },
+      ],
+      ip: 0,
+      op: 60,
+      st: 0,
+      bm: 0,
+    },
+  ],
+};
 
 const CATEGORIES = [
   "Personal Growth",
@@ -30,6 +67,7 @@ const AddLesson = () => {
   const { createLesson } = useLessons();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -58,7 +96,8 @@ const AddLesson = () => {
     const lesson = await createLesson(formData);
 
     if (lesson) {
-      navigate("/dashboard/my-lessons");
+      setShowSuccess(true);
+      setTimeout(() => navigate("/dashboard/my-lessons"), 900);
     }
 
     setLoading(false);
@@ -70,6 +109,14 @@ const AddLesson = () => {
         <h1 className="text-4xl font-bold mb-8 text-primary">
           Share Your Life Lesson
         </h1>
+        {showSuccess && (
+          <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-center">
+            <div className="mx-auto h-24 w-24">
+              <Lottie animationData={successAnimation} loop={false} />
+            </div>
+            <p className="font-semibold text-green-800">Lesson created successfully</p>
+          </div>
+        )}
 
         <form
           onSubmit={handleSubmit}
