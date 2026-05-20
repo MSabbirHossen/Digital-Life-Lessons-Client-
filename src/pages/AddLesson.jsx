@@ -27,11 +27,21 @@ const successAnimation = {
         r: { a: 0, k: 0 },
         p: { a: 0, k: [60, 60, 0] },
         a: { a: 0, k: [0, 0, 0] },
-        s: { a: 1, k: [{ t: 0, s: [0, 0, 100] }, { t: 20, s: [100, 100, 100] }] },
+        s: {
+          a: 1,
+          k: [
+            { t: 0, s: [0, 0, 100] },
+            { t: 20, s: [100, 100, 100] },
+          ],
+        },
       },
       shapes: [
         { ty: "el", p: { a: 0, k: [0, 0] }, s: { a: 0, k: [90, 90] } },
-        { ty: "fl", c: { a: 0, k: [0.13, 0.73, 0.45, 1] }, o: { a: 0, k: 100 } },
+        {
+          ty: "fl",
+          c: { a: 0, k: [0.13, 0.73, 0.45, 1] },
+          o: { a: 0, k: 100 },
+        },
       ],
       ip: 0,
       op: 60,
@@ -114,7 +124,9 @@ const AddLesson = () => {
             <div className="mx-auto h-24 w-24">
               <Lottie animationData={successAnimation} loop={false} />
             </div>
-            <p className="font-semibold text-green-800">Lesson created successfully</p>
+            <p className="font-semibold text-green-800">
+              Lesson created successfully
+            </p>
           </div>
         )}
 
@@ -222,18 +234,31 @@ const AddLesson = () => {
               <label className="block text-sm font-medium mb-2">
                 Access Level
               </label>
-              <select
-                name="accessLevel"
-                value={formData.accessLevel}
-                onChange={handleChange}
-                disabled={!user.isPremium}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary disabled:opacity-50"
+              <div
+                title={
+                  !user.isPremium
+                    ? "Upgrade to Premium to create paid lessons"
+                    : ""
+                }
               >
-                <option value="Free">Free</option>
-                <option value="Premium" disabled={!user.isPremium}>
-                  Premium {!user.isPremium && "(Upgrade to unlock)"}
-                </option>
-              </select>
+                <select
+                  name="accessLevel"
+                  value={formData.accessLevel}
+                  onChange={handleChange}
+                  disabled={!user.isPremium}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary disabled:opacity-50"
+                >
+                  <option value="Free">Free</option>
+                  <option value="Premium" disabled={!user.isPremium}>
+                    Premium {!user.isPremium && "(Upgrade to unlock)"}
+                  </option>
+                </select>
+              </div>
+              {!user.isPremium && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Upgrade to Premium to create paid lessons
+                </p>
+              )}
             </div>
           </div>
 

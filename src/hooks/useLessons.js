@@ -51,7 +51,7 @@ export const useLessons = () => {
       toast.success("Lesson created successfully");
       return response.data.lesson;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create lesson");
+      toast.error("Failed to create lesson");
       return null;
     } finally {
       setLoading(false);
