@@ -15,95 +15,88 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
   return (
     <article
       onClick={() => navigate(`/lessons/${lesson._id}`)}
-      className="card p-4 h-full flex flex-col overflow-hidden cursor-pointer"
+      className="card flex h-full cursor-pointer flex-col overflow-hidden p-4"
     >
-        {/* Image Container */}
-        <div className="mb-4 relative">
-          <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-            {lesson.imageURL ? (
-              <img
-                src={lesson.imageURL}
-                alt={lesson.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-4xl">📖</span>
-            )}
-          </div>
-
-          {/* Premium Badge */}
-          {lesson.accessLevel === "Premium" && (
-            <div className="absolute top-2 right-2 bg-secondary text-white px-2 py-1 rounded text-xs font-bold">
-              Premium
-            </div>
-          )}
-
-          {/* Blurred Overlay for Locked Content */}
-          {isLocked && (
-            <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
-              <div className="text-white text-center">
-                <div className="text-3xl mb-2">🔒</div>
-                <p className="text-sm font-semibold">Premium Only</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1">
-          <h3 className="font-bold text-lg line-clamp-2 mb-2">
-            {lesson.title}
-          </h3>
-          <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-            {isLocked
-              ? "Premium lesson. Upgrade to read the full reflection."
-              : lesson.description}
-          </p>
-
-          {/* Category and Tone */}
-          <div className="flex flex-wrap gap-2 mb-3">
-            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-              {lesson.category}
-            </span>
-            <span className="text-xs bg-secondary/10 text-secondary px-2 py-1 rounded">
-              {lesson.emotionalTone}
-            </span>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-between items-center text-sm text-gray-500 pt-3 border-t">
-          <div className="flex space-x-4">
-            <span>❤️ {lesson.likesCount}</span>
-            <span>💾 {lesson.favoritesCount}</span>
-          </div>
-          {user && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onFavoriteClick?.(lesson._id);
-              }}
-              className="text-secondary hover:text-secondary/80"
-            >
-              ★
-            </button>
-          )}
-        </div>
-
-        {/* Author */}
-        <div className="mt-3 pt-3 border-t text-sm text-gray-600">
-          {lesson.userId?._id ? (
-            <Link
-              to={`/profile/${lesson.userId._id}`}
-              onClick={(event) => event.stopPropagation()}
-              className="hover:text-primary"
-            >
-              By {lesson.userId?.name || "Unknown"}
-            </Link>
+      <div className="relative mb-4">
+        <div className="flex h-40 w-full items-center justify-center overflow-hidden rounded-lg bg-gray-200">
+          {lesson.imageURL ? (
+            <img
+              src={lesson.imageURL}
+              alt={lesson.title}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
           ) : (
-            <p>By Unknown</p>
+            <span className="text-sm font-semibold text-gray-500">No image</span>
           )}
         </div>
+
+        {lesson.accessLevel === "Premium" && (
+          <div className="absolute right-2 top-2 rounded bg-secondary px-2 py-1 text-xs font-bold text-white">
+            Premium
+          </div>
+        )}
+
+        {isLocked && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50 backdrop-blur-sm">
+            <div className="text-center text-white">
+              <div className="mb-1 text-2xl">Lock</div>
+              <p className="text-sm font-semibold">Premium Only</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex-1">
+        <h3 className="mb-2 line-clamp-2 text-lg font-bold">{lesson.title}</h3>
+        <p className="mb-3 line-clamp-3 text-sm leading-6 text-gray-600">
+          {isLocked
+            ? "Premium lesson. Upgrade to read the full reflection."
+            : lesson.description}
+        </p>
+
+        <div className="mb-3 flex flex-wrap gap-2">
+          <span className="rounded bg-primary/10 px-2 py-1 text-xs text-primary">
+            {lesson.category}
+          </span>
+          <span className="rounded bg-secondary/10 px-2 py-1 text-xs text-secondary">
+            {lesson.emotionalTone}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between border-t pt-3 text-sm text-gray-500">
+        <div className="flex gap-4">
+          <span>Likes {lesson.likesCount || 0}</span>
+          <span>Saves {lesson.favoritesCount || 0}</span>
+        </div>
+        {user && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onFavoriteClick?.(lesson._id);
+            }}
+            className="rounded px-2 py-1 text-secondary hover:bg-secondary/10"
+          >
+            Save
+          </button>
+        )}
+      </div>
+
+      <div className="mt-3 border-t pt-3 text-sm text-gray-600">
+        {lesson.userId?._id ? (
+          <Link
+            to={`/profile/${lesson.userId._id}`}
+            onClick={(event) => event.stopPropagation()}
+            className="hover:text-primary"
+          >
+            By {lesson.userId?.name || "Unknown"}
+          </Link>
+        ) : (
+          <p>By Unknown</p>
+        )}
+      </div>
     </article>
   );
 };
