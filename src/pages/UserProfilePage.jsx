@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import { toast } from "react-toastify";
+import { LessonCard } from "../components/LessonCard";
+import { useFavorites } from "../hooks/useInteractions";
 
 const UserProfilePage = () => {
   const { user, setIsPremium } = useAuth();
@@ -10,6 +12,40 @@ const UserProfilePage = () => {
     photoURL: "",
   });
   const [loading, setLoading] = useState(false);
+  const [myLessons, setMyLessons] = useState([]);
+  const [sort, setSort] = useState("newest");
+  const [lessonsLoading, setLessonsLoading] = useState(false);
+  const { addFavorite } = useFavorites();
+
+  const fetchMyLessons = async () => {
+    setLessonsLoading(true);
+    try {
+      const res = await api.get("/lessons/user/my-lessons", {
+        params: { limit: 50 },
+      });
+      const publicLessons = (res.data.lessons || []).filter(
+        (l) => l.visibility === "Public",
+      );
+      if (sort === "mostSaved") {
+        publicLessons.sort(
+          (a, b) => (b.favoritesCount || 0) - (a.favoritesCount || 0),
+        );
+      } else {
+        publicLessons.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        );
+      }
+      setMyLessons(publicLessons);
+    } catch (err) {
+      console.error("Error fetching my lessons:", err);
+    } finally {
+      setLessonsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) fetchMyLessons();
+  }, [user, sort]);
 
   useEffect(() => {
     if (user) {
@@ -90,6 +126,40 @@ const UserProfilePage = () => {
               </p>
             </div>
           </div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-8 mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Your Public Lessons</h2>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="px-4 py-2 border rounded-lg"
+            >
+              <option value="newest">Newest</option>
+              <option value="mostSaved">Most saved</option>
+            </select>
+          </div>
+
+          {lessonsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="loader" />
+            </div>
+          ) : myLessons.length ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {myLessons.map((lesson) => (
+                <LessonCard
+                  key={lesson._id}
+                  lesson={lesson}
+                  onFavoriteClick={async () => {
+                    await addFavorite(lesson._id);
+                    fetchMyLessons();
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600">You have no public lessons yet.</p>
+          )}
         </div>
 
         {/* Edit Profile Form */}
