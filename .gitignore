@@ -42,6 +42,9 @@ yarn.lock
 # Ignore test output
 test-output/
 
+# Firebase artifacts
+.firebase/
+
 
 
 
