@@ -13,10 +13,7 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
     !isOwner;
 
   return (
-    <article
-      onClick={() => navigate(`/lessons/${lesson._id}`)}
-      className="card flex h-full cursor-pointer flex-col overflow-hidden p-4"
-    >
+    <article className="card flex h-full flex-col overflow-hidden p-4">
       <div className="relative mb-4">
         <div className="flex h-40 w-full items-center justify-center overflow-hidden rounded-lg bg-gray-200">
           {lesson.imageURL ? (
@@ -27,7 +24,9 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
               loading="lazy"
             />
           ) : (
-            <span className="text-sm font-semibold text-gray-500">No image</span>
+            <span className="text-sm font-semibold text-gray-500">
+              No image
+            </span>
           )}
         </div>
 
@@ -84,7 +83,7 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
         )}
       </div>
 
-      <div className="mt-3 border-t pt-3 text-sm text-gray-600">
+      <div className="mt-3 border-t pt-3 text-sm text-gray-600 flex items-center justify-between">
         {lesson.userId?._id ? (
           <Link
             to={`/profile/${lesson.userId._id}`}
@@ -96,6 +95,13 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
         ) : (
           <p>By Unknown</p>
         )}
+        <button
+          onClick={() => navigate(`/lessons/${lesson._id}`)}
+          className="ml-4 btn-primary text-sm"
+          aria-label={`See details for ${lesson.title}`}
+        >
+          See Details
+        </button>
       </div>
     </article>
   );
