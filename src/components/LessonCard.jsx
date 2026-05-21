@@ -1,9 +1,22 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useEffect, useState } from "react";
+import { FaHeart, FaRegHeart, FaSave, FaRegBookmark } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useInteractions, useFavorites } from "../hooks/useInteractions";
 
 export const LessonCard = ({ lesson, onFavoriteClick }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toggleLike } = useInteractions();
+  const { addFavorite, removeFavorite } = useFavorites();
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    setIsFavorited(Boolean(lesson.isFavorited));
+    setIsLiked(Boolean(lesson.isLiked));
+  }, [lesson.isFavorited, lesson.isLiked]);
 
   const isOwner = user?._id === lesson.userId?._id;
   const isLocked =
@@ -11,6 +24,33 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
     !user?.isPremium &&
     user?.role !== "admin" &&
     !isOwner;
+
+  const handleLikeClick = async (event) => {
+    event.stopPropagation();
+    if (!user) {
+      toast.error("Please login to like lessons");
+      return;
+    }
+    const updated = await toggleLike(lesson._id);
+    if (updated) {
+      setIsLiked((current) => !current);
+    }
+  };
+
+  const handleSaveClick = async (event) => {
+    event.stopPropagation();
+    if (!user) {
+      toast.error("Please login to save lessons");
+      return;
+    }
+    const saved = isFavorited
+      ? await removeFavorite(lesson._id)
+      : await addFavorite(lesson._id);
+    if (saved) {
+      setIsFavorited(!isFavorited);
+      onFavoriteClick?.(lesson._id);
+    }
+  };
 
   return (
     <article className="card flex h-full flex-col overflow-hidden p-4">
@@ -65,22 +105,30 @@ export const LessonCard = ({ lesson, onFavoriteClick }) => {
       </div>
 
       <div className="flex items-center justify-between border-t pt-3 text-sm text-gray-500">
-        <div className="flex gap-4">
-          <span>Likes {lesson.likesCount || 0}</span>
-          <span>Saves {lesson.favoritesCount || 0}</span>
-        </div>
-        {user && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onFavoriteClick?.(lesson._id);
-            }}
-            className="rounded px-2 py-1 text-secondary hover:bg-secondary/10"
-          >
-            Save
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleLikeClick}
+          className={`inline-flex items-center gap-2 rounded px-3 py-2 transition ${
+            isLiked
+              ? "bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300"
+              : "hover:bg-gray-100 dark:hover:bg-slate-800"
+          }`}
+        >
+          {isLiked ? <FaHeart /> : <FaRegHeart />}
+          Like {lesson.likesCount || 0}
+        </button>
+        <button
+          type="button"
+          onClick={handleSaveClick}
+          className={`inline-flex items-center gap-2 rounded px-3 py-2 transition ${
+            isFavorited
+              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+              : "hover:bg-gray-100 dark:hover:bg-slate-800"
+          }`}
+        >
+          {isFavorited ? <FaSave /> : <FaRegBookmark />}
+          {isFavorited ? "Saved" : "Save"}
+        </button>
       </div>
 
       <div className="mt-3 border-t pt-3 text-sm text-gray-600 flex items-center justify-between">

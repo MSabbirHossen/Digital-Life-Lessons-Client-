@@ -3,11 +3,9 @@ import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../services/api";
 import { LessonCard } from "../components/LessonCard";
-import { useFavorites } from "../hooks/useInteractions";
 
 const AuthorProfilePage = () => {
   const { userId } = useParams();
-  const { addFavorite } = useFavorites();
   const [author, setAuthor] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [stats, setStats] = useState(null);
@@ -38,8 +36,7 @@ const AuthorProfilePage = () => {
   };
 
   const handleFavoriteClick = async (lessonId) => {
-    const saved = await addFavorite(lessonId);
-    if (saved) fetchAuthor();
+    fetchAuthor();
   };
 
   if (loading) {

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import { LessonCard } from "../components/LessonCard";
-import { useFavorites } from "../hooks/useInteractions";
 
 const slides = [
   {
@@ -28,7 +27,6 @@ const slides = [
 
 const Home = () => {
   const { user } = useAuth();
-  const { addFavorite } = useFavorites();
   const [featuredLessons, setFeaturedLessons] = useState([]);
   const [mostSavedLessons, setMostSavedLessons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,9 +92,9 @@ const Home = () => {
     return Array.from(authors.values()).slice(0, 4);
   }, [featuredLessons]);
 
-  const handleFavoriteClick = async (lessonId) => {
-    await addFavorite(lessonId);
+  const handleFavoriteClick = async () => {
     fetchFeaturedLessons();
+    fetchMostSaved();
   };
 
   const slide = slides[activeSlide];
@@ -105,7 +103,7 @@ const Home = () => {
 
   return (
     <div>
-      <section className="bg-gradient-to-br from-indigo-50 via-white to-emerald-50 px-4 py-16 sm:py-20">
+      <section className="bg-gradient-to-br from-indigo-50 via-white to-emerald-50 px-4 py-16 sm:py-20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
           <div>
             <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-secondary">
@@ -114,7 +112,7 @@ const Home = () => {
             <h1 className="mb-5 max-w-3xl text-4xl font-bold text-primary sm:text-5xl lg:text-6xl">
               {slide.title}
             </h1>
-            <p className="mb-8 max-w-2xl text-lg leading-8 text-gray-700">
+            <p className="mb-8 max-w-2xl text-lg leading-8 text-gray-700 dark:text-slate-300">
               {slide.copy}
             </p>
             <div className="flex flex-wrap gap-3">
@@ -137,7 +135,7 @@ const Home = () => {
                   className={`h-2.5 rounded-full transition-all ${
                     activeSlide === index
                       ? "w-10 bg-primary"
-                      : "w-2.5 bg-gray-300"
+                      : "w-2.5 bg-gray-300 dark:bg-slate-600"
                   }`}
                   aria-label={`Show slide ${index + 1}`}
                 />
@@ -145,7 +143,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white bg-white/80 p-6 shadow-xl">
+          <div className="rounded-2xl border border-white bg-white/80 p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900/80">
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-xl bg-primary p-5 text-white">
                 <p className="text-3xl font-bold">
@@ -171,32 +169,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="bg-gray-50 px-4 py-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-3xl font-bold">Most Saved Lessons</h2>
-            <Link to="/lessons" className="text-sm text-primary underline">
-              View all
-            </Link>
-          </div>
-
-          {mostSavedLessons.length ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {mostSavedLessons.map((lesson) => (
-                <LessonCard
-                  key={lesson._id}
-                  lesson={lesson}
-                  onFavoriteClick={handleFavoriteClick}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-600">No popular lessons yet.</p>
-          )}
-        </div>
-      </section>
-
-      <section className="bg-white px-4 py-16">
+      <section className="bg-white px-4 py-16 dark:bg-slate-950">
         <div className="mx-auto max-w-7xl">
           <h2 className="mb-10 text-center text-3xl font-bold">
             Why Learning From Life Matters
@@ -219,19 +192,21 @@ const Home = () => {
             ].map(([title, copy]) => (
               <div key={title} className="card p-6">
                 <h3 className="mb-2 text-lg font-bold">{title}</h3>
-                <p className="text-sm leading-6 text-gray-600">{copy}</p>
+                <p className="text-sm leading-6 text-gray-600 dark:text-slate-300">
+                  {copy}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-gray-50 px-4 py-16">
+      <section className="bg-gray-50 px-4 py-16 dark:bg-slate-900">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <h2 className="text-3xl font-bold">Featured Life Lessons</h2>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-gray-600 dark:text-slate-300">
                 Admin-curated lessons and high-value community reflections.
               </p>
             </div>
@@ -245,7 +220,7 @@ const Home = () => {
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-72 animate-pulse rounded-lg bg-white shadow"
+                  className="h-72 animate-pulse rounded-lg bg-white shadow dark:bg-slate-800"
                 />
               ))}
             </div>
@@ -260,9 +235,9 @@ const Home = () => {
               ))}
             </div>
           ) : (
-            <div className="rounded-lg bg-white p-10 text-center shadow">
+            <div className="rounded-lg bg-white p-10 text-center shadow dark:bg-slate-900">
               <h3 className="text-xl font-bold">No featured lessons yet</h3>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-gray-600 dark:text-slate-300">
                 Admins can feature strong lessons from the moderation dashboard.
               </p>
             </div>
@@ -270,27 +245,56 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="bg-white px-4 py-16">
+      <section className="bg-white px-4 py-16 dark:bg-slate-950">
         <div className="mx-auto max-w-7xl">
-          <h2 className="mb-8 text-3xl font-bold">Top Contributors</h2>
+          <h2 className="mb-8 text-3xl font-bold">
+            Top Contributors of the Week
+          </h2>
           {topContributors.length ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               {topContributors.map((author) => (
                 <Link
                   key={author._id}
                   to={`/profile/${author._id}`}
-                  className="rounded-lg border border-gray-200 p-5 transition hover:border-primary"
+                  className="rounded-lg border border-gray-200 p-5 transition hover:border-primary dark:border-slate-800 dark:hover:border-primary"
                 >
                   <p className="font-semibold">{author.name}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-slate-300">
                     {author.lessonsCreated || author.count} lessons shared
                   </p>
                 </Link>
               ))}
             </div>
           ) : (
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-slate-300">
               Contributor stats will appear after lessons are shared.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="bg-gray-50 px-4 py-16 dark:bg-slate-900">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-3xl font-bold">Most Saved Lessons</h2>
+            <Link to="/lessons" className="text-sm text-primary underline">
+              View all
+            </Link>
+          </div>
+
+          {mostSavedLessons.length ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {mostSavedLessons.map((lesson) => (
+                <LessonCard
+                  key={lesson._id}
+                  lesson={lesson}
+                  onFavoriteClick={handleFavoriteClick}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600 dark:text-slate-300">
+              No popular lessons yet.
             </p>
           )}
         </div>

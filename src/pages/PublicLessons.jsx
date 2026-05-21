@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useLessons } from "../hooks/useLessons";
-import { useFavorites } from "../hooks/useInteractions";
 import { LessonCard } from "../components/LessonCard";
 import { EMOTIONAL_TONES, LESSON_CATEGORIES } from "../constants/lessons";
 
 const PublicLessons = () => {
   const { lessons, loading, pagination, getPublicLessons } = useLessons();
-  const { addFavorite } = useFavorites();
 
   const [filters, setFilters] = useState({
     search: "",
@@ -33,7 +31,6 @@ const PublicLessons = () => {
   };
 
   const handleFavoriteClick = async (lessonId) => {
-    await addFavorite(lessonId);
     getPublicLessons(
       currentPage,
       filters.search,

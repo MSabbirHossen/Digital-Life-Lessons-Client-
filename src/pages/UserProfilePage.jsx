@@ -3,7 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import { toast } from "react-toastify";
 import { LessonCard } from "../components/LessonCard";
-import { useFavorites } from "../hooks/useInteractions";
 
 const UserProfilePage = () => {
   const { user, setIsPremium } = useAuth();
@@ -15,7 +14,6 @@ const UserProfilePage = () => {
   const [myLessons, setMyLessons] = useState([]);
   const [sort, setSort] = useState("newest");
   const [lessonsLoading, setLessonsLoading] = useState(false);
-  const { addFavorite } = useFavorites();
 
   const fetchMyLessons = async () => {
     setLessonsLoading(true);
@@ -150,10 +148,7 @@ const UserProfilePage = () => {
                 <LessonCard
                   key={lesson._id}
                   lesson={lesson}
-                  onFavoriteClick={async () => {
-                    await addFavorite(lesson._id);
-                    fetchMyLessons();
-                  }}
+                  onFavoriteClick={fetchMyLessons}
                 />
               ))}
             </div>
