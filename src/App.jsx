@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -36,6 +36,7 @@ const ManageLessonsPage = lazy(() => import("./pages/ManageLessonsPage"));
 const ReportedLessonsPage = lazy(() => import("./pages/ReportedLessonsPage"));
 const AdminProfilePage = lazy(() => import("./pages/AdminProfilePage"));
 const AuthorProfilePage = lazy(() => import("./pages/AuthorProfilePage"));
+const MeetDeveloperPage = lazy(() => import("./pages/MeetDeveloper"));
 
 const PageLoader = () => (
   <div className="flex min-h-[60vh] items-center justify-center">
@@ -47,11 +48,23 @@ const AppShell = () => {
   const location = useLocation();
   const hideChrome = location.pathname === "/404";
 
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme");
+    const systemTheme =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    const theme = storedTheme || systemTheme;
+
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       {!hideChrome && <Navbar />}
       <main className="flex-grow">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-10/12 px-4 sm:px-6 lg:px-8">
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Public Routes */}
@@ -60,6 +73,10 @@ const AppShell = () => {
               <Route path="/register" element={<Register />} />
               <Route path="/lessons" element={<PublicLessons />} />
               <Route path="/public-lessons" element={<PublicLessons />} />
+              <Route
+                path="/meet-the-developer"
+                element={<MeetDeveloperPage />}
+              />
               <Route
                 path="/lessons/:id"
                 element={

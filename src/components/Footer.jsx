@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { FaTwitter, FaFacebookF, FaLinkedinIn } from "react-icons/fa";
+import { FaFacebookF, FaLinkedinIn } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 export const Footer = () => {
   return (
@@ -8,7 +9,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="font-bold text-lg mb-4">📚 Digital Life Lessons</h3>
+            <h3 className="font-bold text-lg mb-4">Digital Life Lessons</h3>
             <p className="text-gray-400 text-sm">
               Preserve your wisdom, share your stories, grow together.
             </p>
@@ -34,6 +35,14 @@ export const Footer = () => {
                   className="hover:text-white transition"
                 >
                   Contact Us
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/meet-the-developer"
+                  className="hover:text-white transition"
+                >
+                  Meet the Developer
                 </a>
               </li>
             </ul>
@@ -65,17 +74,17 @@ export const Footer = () => {
                 aria-label="Twitter"
                 className="inline-flex h-10 w-10 items-center justify-center rounded bg-white/5 text-white hover:bg-white/10 transition"
               >
-                <FaTwitter />
+                <FaXTwitter />
               </a>
               <a
-                href="#"
+                href="https://www.facebook.com/parttimecoder/"
                 aria-label="Facebook"
                 className="inline-flex h-10 w-10 items-center justify-center rounded bg-white/5 text-white hover:bg-white/10 transition"
               >
                 <FaFacebookF />
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/in/ms-hossen/"
                 aria-label="LinkedIn"
                 className="inline-flex h-10 w-10 items-center justify-center rounded bg-white/5 text-white hover:bg-white/10 transition"
               >
