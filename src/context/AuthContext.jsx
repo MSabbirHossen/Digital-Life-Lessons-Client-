@@ -14,8 +14,15 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
-  const [loading, setLoading] = useState(() => !localStorage.getItem("user"));
-  const [isPremium, setIsPremium] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isPremium, setIsPremium] = useState(() => {
+    try {
+      const cachedUser = localStorage.getItem("user");
+      return cachedUser ? Boolean(JSON.parse(cachedUser)?.isPremium) : false;
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     const handleUnauthorized = () => {
