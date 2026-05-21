@@ -128,6 +128,10 @@ const LessonDetailsPage = () => {
 
   const handleReport = async (e) => {
     e.preventDefault();
+    if (isOwner) {
+      toast.error("You cannot report your own lesson");
+      return;
+    }
     if (!reportData.reason) {
       toast.error("Please select a reason");
       return;
@@ -201,6 +205,7 @@ const LessonDetailsPage = () => {
 
   const isOwner = user?._id === lesson.userId?._id;
   const canModerate = user?.role === "admin" || isOwner;
+  const canReport = user && !isOwner;
   const shareUrl = window.location.href;
 
   return (
@@ -224,24 +229,6 @@ const LessonDetailsPage = () => {
               <p className="text-gray-600">
                 Category: {lesson.category} • Tone: {lesson.emotionalTone}
               </p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleFavoriteClick}
-                className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-                  isFavorited
-                    ? "bg-red-100 text-red-600"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-              >
-                {isFavorited ? "Saved" : "Save"}
-              </button>
-              <button
-                onClick={handleLike}
-                className="px-4 py-2 rounded-lg bg-blue-100 text-blue-600 flex items-center gap-2"
-              >
-                Like {lesson.likesCount || 0}
-              </button>
             </div>
           </div>
 
@@ -378,12 +365,14 @@ const LessonDetailsPage = () => {
             >
               Like {lesson.likesCount || 0}
             </button>
-            <button
-              onClick={() => setShowReportModal(true)}
-              className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200"
-            >
-              Report
-            </button>
+            {canReport && (
+              <button
+                onClick={() => setShowReportModal(true)}
+                className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200"
+              >
+                Report
+              </button>
+            )}
             <button
               onClick={() => handleExportPDF()}
               className="px-4 py-2 bg-gray-50 text-gray-700 rounded-lg border"
@@ -436,9 +425,9 @@ const LessonDetailsPage = () => {
                   ? "Upgrade to Premium to join this discussion."
                   : "Please login to comment on this lesson"}
               </p>
-              <a href="/login" className="btn-primary">
+              <Link to="/login" className="btn-primary">
                 Login
-              </a>
+              </Link>
             </div>
           )}
 
