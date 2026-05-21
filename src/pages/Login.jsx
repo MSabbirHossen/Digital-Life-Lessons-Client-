@@ -19,6 +19,19 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
 
+  const getRedirectTarget = () => {
+    const redirectParam = new URLSearchParams(location.search).get("redirect");
+    if (redirectParam) return redirectParam;
+
+    const from = location.state?.from;
+    if (typeof from === "string") return from;
+    if (from?.pathname) {
+      return `${from.pathname}${from.search || ""}${from.hash || ""}`;
+    }
+
+    return "/";
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -31,11 +44,7 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       toast.success("Logged in successfully!");
-      const redirect =
-        new URLSearchParams(location.search).get("redirect") ||
-        location.state?.from?.pathname ||
-        "/";
-      navigate(redirect, { replace: true });
+      navigate(getRedirectTarget(), { replace: true });
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -49,11 +58,7 @@ const Login = () => {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       toast.success("Logged in with Google!");
-      const redirect =
-        new URLSearchParams(location.search).get("redirect") ||
-        location.state?.from?.pathname ||
-        "/";
-      navigate(redirect, { replace: true });
+      navigate(getRedirectTarget(), { replace: true });
     } catch (error) {
       toast.error(error.message);
     } finally {
