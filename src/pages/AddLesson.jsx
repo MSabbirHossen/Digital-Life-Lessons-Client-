@@ -78,6 +78,7 @@ const AddLesson = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -91,13 +92,36 @@ const AddLesson = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const validateForm = () => {
+    const nextErrors = {};
+
+    if (!formData.title.trim()) nextErrors.title = "Title is required";
+    if (!formData.description.trim())
+      nextErrors.description = "Description is required";
+    if (!formData.category) nextErrors.category = "Category is required";
+    if (!formData.emotionalTone)
+      nextErrors.emotionalTone = "Emotional tone is required";
+    if (!formData.visibility) nextErrors.visibility = "Visibility is required";
+    if (!formData.accessLevel)
+      nextErrors.accessLevel = "Access level is required";
+    if (formData.accessLevel === "Premium" && !user?.isPremium) {
+      nextErrors.accessLevel = "Upgrade to Premium to create paid lessons";
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setLoading(true);
 
-    if (formData.accessLevel === "Premium" && !user.isPremium) {
+    if (formData.accessLevel === "Premium" && !user?.isPremium) {
       toast.error("Only Premium users can create Premium lessons");
       setLoading(false);
       return;
@@ -145,6 +169,9 @@ const AddLesson = () => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
               required
             />
+            {errors.title && (
+              <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+            )}
           </div>
 
           <div>
@@ -160,6 +187,9 @@ const AddLesson = () => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
               required
             />
+            {errors.description && (
+              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -179,6 +209,9 @@ const AddLesson = () => {
                   </option>
                 ))}
               </select>
+              {errors.category && (
+                <p className="mt-1 text-sm text-red-600">{errors.category}</p>
+              )}
             </div>
 
             <div>
@@ -197,6 +230,11 @@ const AddLesson = () => {
                   </option>
                 ))}
               </select>
+              {errors.emotionalTone && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.emotionalTone}
+                </p>
+              )}
             </div>
           </div>
 
@@ -228,6 +266,9 @@ const AddLesson = () => {
                 <option value="Public">Public</option>
                 <option value="Private">Private</option>
               </select>
+              {errors.visibility && (
+                <p className="mt-1 text-sm text-red-600">{errors.visibility}</p>
+              )}
             </div>
 
             <div>
@@ -254,9 +295,14 @@ const AddLesson = () => {
                   </option>
                 </select>
               </div>
-              {!user.isPremium && (
+              {!user?.isPremium && (
                 <p className="text-xs text-gray-500 mt-1">
                   Upgrade to Premium to create paid lessons
+                </p>
+              )}
+              {errors.accessLevel && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.accessLevel}
                 </p>
               )}
             </div>
