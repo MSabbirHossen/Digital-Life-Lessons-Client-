@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
@@ -29,12 +29,16 @@ const Home = () => {
   const { user } = useAuth();
   const [featuredLessons, setFeaturedLessons] = useState([]);
   const [mostSavedLessons, setMostSavedLessons] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [topContributors, setTopContributors] = useState([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+  const [mostSavedLoading, setMostSavedLoading] = useState(true);
+  const [contributorsLoading, setContributorsLoading] = useState(true);
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
     fetchFeaturedLessons();
     fetchMostSaved();
+    fetchTopContributors();
   }, []);
 
   useEffect(() => {
@@ -50,50 +54,41 @@ const Home = () => {
       const response = await api.get("/lessons/featured", {
         params: { limit: 6 },
       });
-      if (response.data.lessons?.length) {
-        setFeaturedLessons(response.data.lessons);
-        return;
-      }
-
-      const fallback = await api.get("/lessons/public", {
-        params: { limit: 6, sort: "mostSaved" },
-      });
-      setFeaturedLessons(fallback.data.lessons || []);
+      setFeaturedLessons(response.data.lessons || []);
     } catch (error) {
       console.error("Error fetching featured lessons:", error);
     } finally {
-      setLoading(false);
+      setFeaturedLoading(false);
     }
   };
 
   const fetchMostSaved = async () => {
+    setMostSavedLoading(true);
     try {
-      const res = await api.get("/lessons/public", {
-        params: { sort: "mostSaved", limit: 6 },
-      });
+      const res = await api.get("/lessons/top-saved");
       setMostSavedLessons(res.data.lessons || []);
     } catch (err) {
       console.error("Error fetching most saved lessons:", err);
+      setMostSavedLessons([]);
+    } finally {
+      setMostSavedLoading(false);
     }
   };
 
-  const topContributors = useMemo(() => {
-    const authors = new Map();
-    featuredLessons.forEach((lesson) => {
-      const author = lesson.userId;
-      if (!author?._id) return;
-      const current = authors.get(author._id) || {
-        ...author,
-        count: 0,
-      };
-      current.count += 1;
-      authors.set(author._id, current);
-    });
-    return Array.from(authors.values()).slice(0, 4);
-  }, [featuredLessons]);
+  const fetchTopContributors = async () => {
+    setContributorsLoading(true);
+    try {
+      const res = await api.get("/lessons/top-contributors-week");
+      setTopContributors(res.data.contributors || []);
+    } catch (error) {
+      console.error("Error fetching top contributors:", error);
+      setTopContributors([]);
+    } finally {
+      setContributorsLoading(false);
+    }
+  };
 
   const handleFavoriteClick = async () => {
-    fetchFeaturedLessons();
     fetchMostSaved();
   };
 
@@ -215,7 +210,7 @@ const Home = () => {
             </Link>
           </div>
 
-          {loading ? (
+          {featuredLoading ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
@@ -250,8 +245,17 @@ const Home = () => {
           <h2 className="mb-8 text-3xl font-bold">
             Top Contributors of the Week
           </h2>
-          {topContributors.length ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          {contributorsLoading ? (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-28 animate-pulse rounded-lg bg-gray-100 dark:bg-slate-800"
+                />
+              ))}
+            </div>
+          ) : topContributors.length ? (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {topContributors.map((author) => (
                 <Link
                   key={author._id}
@@ -260,14 +264,14 @@ const Home = () => {
                 >
                   <p className="font-semibold">{author.name}</p>
                   <p className="text-sm text-gray-600 dark:text-slate-300">
-                    {author.lessonsCreated || author.count} lessons shared
+                    {author.lessonCount || 0} lessons this week
                   </p>
                 </Link>
               ))}
             </div>
           ) : (
             <p className="text-gray-600 dark:text-slate-300">
-              Contributor stats will appear after lessons are shared.
+              No contributors available this week.
             </p>
           )}
         </div>
@@ -282,7 +286,16 @@ const Home = () => {
             </Link>
           </div>
 
-          {mostSavedLessons.length ? (
+          {mostSavedLoading ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-72 animate-pulse rounded-lg bg-white shadow dark:bg-slate-800"
+                />
+              ))}
+            </div>
+          ) : mostSavedLessons.length ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {mostSavedLessons.map((lesson) => (
                 <LessonCard
@@ -294,7 +307,7 @@ const Home = () => {
             </div>
           ) : (
             <p className="text-gray-600 dark:text-slate-300">
-              No popular lessons yet.
+              No saved lessons yet.
             </p>
           )}
         </div>
