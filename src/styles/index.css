@@ -12,9 +12,66 @@ html {
   scroll-behavior: smooth;
 }
 
+html.dark {
+  color-scheme: dark;
+}
+
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+}
+
+html.dark body {
+  background-color: rgb(2 6 23);
+  color: rgb(226 232 240);
+}
+
+html.dark .bg-white {
+  background-color: rgb(15 23 42) !important;
+  color: rgb(226 232 240) !important;
+}
+
+html.dark .bg-white\/80 {
+  background-color: rgba(15, 23, 42, 0.82) !important;
+  color: rgb(226 232 240) !important;
+}
+
+html.dark .bg-gray-50 {
+  background-color: rgb(15 23 42) !important;
+}
+
+html.dark .bg-gray-100 {
+  background-color: rgb(30 41 59) !important;
+}
+
+html.dark .bg-gray-200 {
+  background-color: rgb(51 65 85) !important;
+}
+
+html.dark .border-white {
+  border-color: rgb(51 65 85) !important;
+}
+
+html.dark .border-gray-200,
+html.dark .border-gray-300 {
+  border-color: rgb(51 65 85) !important;
+}
+
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700,
+html.dark .text-gray-600,
+html.dark .text-gray-500 {
+  color: rgb(226 232 240) !important;
+}
+
+html.dark .text-gray-400 {
+  color: rgb(148 163 184) !important;
+}
+
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover {
+  background-color: rgb(30 41 59) !important;
 }
 
 button {
@@ -40,7 +97,13 @@ select {
 }
 
 .card {
-  @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow;
+  @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow dark:bg-gray-900 dark:text-gray-100;
+}
+
+input,
+textarea,
+select {
+  @apply bg-white dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700;
 }
 
 .loader {

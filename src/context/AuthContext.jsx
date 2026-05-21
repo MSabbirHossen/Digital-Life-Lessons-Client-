@@ -6,11 +6,27 @@ import api from "../services/api";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    try {
+      const cachedUser = localStorage.getItem("user");
+      return cachedUser ? JSON.parse(cachedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState(() => !localStorage.getItem("user"));
   const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
+    const handleUnauthorized = () => {
+      setUser(null);
+      setIsPremium(false);
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
+    };
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
@@ -31,6 +47,12 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem("user", JSON.stringify(userData));
         } catch (error) {
           console.error("Error syncing user:", error);
+          const cachedUser = localStorage.getItem("user");
+          if (cachedUser) {
+            const parsedUser = JSON.parse(cachedUser);
+            setUser(parsedUser);
+            setIsPremium(parsedUser.isPremium);
+          }
         }
       } else {
         setUser(null);
@@ -41,13 +63,18 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
+    };
   }, []);
 
   const logout = () => {
     auth.signOut();
     setUser(null);
     setIsPremium(false);
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
   };
 
   return (

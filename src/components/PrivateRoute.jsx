@@ -16,7 +16,7 @@ export const PrivateRoute = ({ children }) => {
   return user ? (
     children
   ) : (
-    <Navigate to="/login" replace state={{ from: location.pathname }} />
+    <Navigate to="/login" replace state={{ from: location }} />
   );
 };
 
@@ -31,5 +31,5 @@ export const AdminRoute = ({ children }) => {
     );
   }
 
-  return user?.role === "admin" ? children : <Navigate to="/" />;
+  return user?.role === "admin" ? children : <Navigate to="/" replace />;
 };

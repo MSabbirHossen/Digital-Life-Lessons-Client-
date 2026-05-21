@@ -33,9 +33,9 @@ const Login = () => {
       toast.success("Logged in successfully!");
       const redirect =
         new URLSearchParams(location.search).get("redirect") ||
-        location.state?.from ||
+        location.state?.from?.pathname ||
         "/";
-      navigate(redirect);
+      navigate(redirect, { replace: true });
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -51,9 +51,9 @@ const Login = () => {
       toast.success("Logged in with Google!");
       const redirect =
         new URLSearchParams(location.search).get("redirect") ||
-        location.state?.from ||
+        location.state?.from?.pathname ||
         "/";
-      navigate(redirect);
+      navigate(redirect, { replace: true });
     } catch (error) {
       toast.error(error.message);
     } finally {

@@ -5,7 +5,9 @@ import { FaMoon, FaSun } from "react-icons/fa";
 
 const linkClass = ({ isActive }) =>
   `text-sm font-medium transition ${
-    isActive ? "text-primary" : "text-gray-700 hover:text-primary"
+    isActive
+      ? "text-primary"
+      : "text-gray-700 hover:text-primary dark:text-gray-200"
   }`;
 
 export const Navbar = () => {
@@ -58,7 +60,7 @@ export const Navbar = () => {
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+    <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link
@@ -98,7 +100,7 @@ export const Navbar = () => {
           <div className="hidden items-center gap-3 md:flex">
             <button
               onClick={toggleTheme}
-              className="text-gray-600 mr-2"
+              className="mr-2 text-gray-600 dark:text-gray-200"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? <FaSun /> : <FaMoon />}
@@ -120,13 +122,13 @@ export const Navbar = () => {
                   </Link>
                 )}
                 {user.isPremium && (
-                  <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-800">
+                  <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-800 dark:bg-yellow-200 dark:text-yellow-900">
                     Premium
                   </span>
                 )}
                 <Link
                   to="/dashboard/profile"
-                  className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700"
+                  className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-100"
                 >
                   {user.photoURL ? (
                     <img
@@ -150,7 +152,7 @@ export const Navbar = () => {
 
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 md:hidden dark:border-gray-700"
             onClick={() => setIsMenuOpen((open) => !open)}
             aria-label="Toggle navigation menu"
             aria-expanded={isMenuOpen}
@@ -161,7 +163,7 @@ export const Navbar = () => {
       </div>
 
       {isMenuOpen && (
-        <div className="border-t border-gray-200 bg-white px-4 py-4 md:hidden">
+        <div className="border-t border-gray-200 bg-white px-4 py-4 md:hidden dark:border-gray-800 dark:bg-gray-900">
           <div className="flex flex-col gap-3">
             {publicLinks.map((item) => (
               <NavLink

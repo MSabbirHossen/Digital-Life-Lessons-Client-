@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const FALLBACK_API_BASE_URL = "https://digital-life-lessons-server.vercel.app/api";
+const FALLBACK_API_BASE_URL =
+  "https://digital-life-lessons-server.vercel.app/api";
 
 const configuredApiBaseUrl =
   import.meta.env.VITE_API_BASE_URL ||
@@ -40,7 +41,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("authToken");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      window.dispatchEvent(new Event("auth:unauthorized"));
     }
     return Promise.reject(error);
   },
